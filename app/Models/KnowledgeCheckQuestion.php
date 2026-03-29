@@ -4,22 +4,24 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class UserProgress extends Model
+class KnowledgeCheckQuestion extends Model
 {
     protected $fillable = [
-        'user_id',
         'roadmap_node_id',
-        'status',
-        'completed_at'
+        'question',
+        'topic',
+        'options',
+        'correct_answer',
+        'difficulty',
+        'weight',
+    ];
+
+    protected $casts = [
+        'options' => 'array'
     ];
 
     public function node()
     {
         return $this->belongsTo(RoadmapNode::class, 'roadmap_node_id');
-    }
-
-      public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id');
     }
 }

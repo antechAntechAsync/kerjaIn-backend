@@ -14,49 +14,65 @@ class GroqAIService
         $roleList = implode(", ", $roles);
 
         $prompt = "
-You are an AI career advisor.
+        You are an AI career advisor.
 
-Generate a learning roadmap for the following careers:
+        Generate a learning roadmap for the following careers:
 
-$roleList
+        $roleList
 
-For EACH career role generate:
+        For EACH career role generate:
 
-- 5 important skills to learn
-- 1 learning resource for each skill
+        - 5 important skills to learn
+        - A short description explaining the ability someone should have for that skill
+        - 1 high quality learning resource for each skill
 
-Resources must come from real learning platforms such as:
-YouTube, Coursera, freeCodeCamp, MDN, W3Schools, official documentation.
+        For EACH skill provide:
+        - Each skill must be relevant to current industry demand (2025+)
+        - Avoid outdated technologies unless foundational
 
-Return STRICT JSON in this format:
+        The description must describe:
+        - what someone should be able to do with the skill
+        - practical capability, not a dictionary definition
+        - keep it concise (1-2 sentence)
 
-{
-  \"careers\": [
-    {
-      \"role\": \"Career Name\",
-      \"roadmap\": [
+        Example:
+
+        Skill: SEO Optimization
+        Description: Ability to optimize website content and structure to improve search engine rankings using basic SEO techniques.
+
+        Resources must come from real learning platforms such as:
+        YouTube, Coursera, freeCodeCamp, MDN, W3Schools, official documentation.
+
+        Return STRICT JSON in this format:
+
         {
-          \"skill\": \"Skill name\",
-          \"resources\": [
+        \"careers\": [
             {
-              \"title\": \"Resource title\",
-              \"url\": \"https://example.com\",
-              \"type\": \"video/article/documentation/course\"
+            \"role\": \"Career Name\",
+            \"roadmap\": [
+                {
+                \"skill\": \"Skill name\",
+                \"description\": \"Short explanation of the skill\",
+                \"resources\": [
+                    {
+                    \"title\": \"Resource title\",
+                    \"url\": \"https://example.com\",
+                    \"type\": \"video/article/documentation/course\"
+                    }
+                ]
+                }
+            ]
             }
-          ]
+        ]
         }
-      ]
-    }
-  ]
-}
 
-Rules:
-- Do NOT add explanations
-- Do NOT wrap JSON in markdown
-- Ensure valid JSON
-- URLs must be inside double quotes
-- Only return JSON
-";
+        Rules:
+        - Do NOT add explanations
+        - Do NOT wrap JSON in markdown
+        - Ensure valid JSON
+        - URLs must be inside double quotes
+        - Only return JSON
+        ";
 
         $response = Http::timeout(20)
             ->retry(2, 2000)
@@ -84,20 +100,8 @@ Rules:
 
         $content = trim($content);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Clean AI Response
-        |--------------------------------------------------------------------------
-        */
-
         $content = preg_replace('/```json|```/', '', $content);
         $content = trim($content);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Extract JSON if extra text exists
-        |--------------------------------------------------------------------------
-        */
 
         $start = strpos($content, '{');
         $end = strrpos($content, '}');
@@ -131,5 +135,207 @@ Rules:
         }
 
         return [];
+    }
+
+    public function generateInterestResponse(array $messages)
+    {
+        $systemPrompt = "
+        You are a professional career consultant AI.
+
+        Your task is to ask questions to determine the user's most suitable career role.
+
+        Rules:
+        - Ask only ONE question at a time
+        - Maximum 10 questions
+        - Be adaptive based on previous answers
+        - Consider student's major and interest
+        - Consider industry demand
+
+        If you already have enough information, STOP asking questions and return ONLY:
+
+        CRITICAL RULE:
+        - OUTPUT MUST BE EXACTLY IN THIS FORMAT:
+        FINAL_ROLE: <role name>
+
+        - NO additional sentences
+        - NO explanation
+        - NO punctuation after role
+        - If you add anything else, the response is INVALID
+        ";
+
+        $formattedMessages = [
+            [
+                "role" => "system",
+                "content" => $systemPrompt
+            ]
+        ];
+
+        foreach ($messages as $msg) {
+            $formattedMessages[] = [
+                "role" => $msg['sender'] === 'user' ? 'user' : 'assistant',
+                "content" => $msg['message']
+            ];
+        }
+
+        $response = Http::timeout(20)
+            ->retry(2, 2000)
+            ->withHeaders([
+                'Authorization' => 'Bearer ' . config('services.groq.key'),
+                'Content-Type' => 'application/json'
+            ])
+            ->post('https://api.groq.com/openai/v1/chat/completions', [
+                "model" => "llama-3.3-70b-versatile",
+                "messages" => $formattedMessages
+            ]);
+
+        $data = $response->json();
+
+        if (!isset($data['choices'][0]['message']['content'])) {
+            throw new \Exception('Invalid AI response');
+        }
+
+        return trim($data['choices'][0]['message']['content']);
+    }
+
+
+    public function generateHighDemandSkills($role, $level)
+    {
+        $prompt = "
+    You are an industry expert.
+
+    Based on this role:
+    $role
+
+    And skill level:
+    $level
+
+    Generate 3-5 HIGH DEMAND skills in current industry (2025+).
+
+    Rules:
+    - Only skill names
+    - No explanation
+    - Return JSON array
+
+    Example:
+    [\"Docker\", \"Redis\", \"Microservices\"]
+    ";
+
+        $response = Http::timeout(20)
+            ->retry(2, 2000)
+            ->withHeaders([
+                'Authorization' => 'Bearer ' . config('services.groq.key'),
+                'Content-Type' => 'application/json'
+            ])
+            ->post('https://api.groq.com/openai/v1/chat/completions', [
+                "model" => "llama-3.3-70b-versatile",
+                "messages" => [
+                    [
+                        "role" => "user",
+                        "content" => $prompt
+                    ]
+                ]
+            ]);
+
+        $data = $response->json();
+
+        if (!isset($data['choices'][0]['message']['content'])) {
+            throw new \Exception('Invalid AI response');
+        }
+
+        $content = trim($data['choices'][0]['message']['content']);
+
+        // 🔧 bersihin kalau AI nakal (kadang kasih ```json)
+        $content = preg_replace('/```json|```/', '', $content);
+        $content = trim($content);
+
+        // 🔧 ambil hanya array JSON
+        $start = strpos($content, '[');
+        $end = strrpos($content, ']');
+
+        if ($start !== false && $end !== false) {
+            $content = substr($content, $start, $end - $start + 1);
+        }
+
+        $decoded = json_decode($content, true);
+
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    public function generateKnowledgeQuestions($skillName)
+    {
+        $prompt = "
+    You are a technical interviewer.
+
+    Create 5 multiple choice questions for the skill:
+    $skillName
+
+    Rules:
+    - Each question must test practical understanding
+    - 4 options (A, B, C, D)
+    - Only ONE correct answer
+    - Avoid trivial definition questions
+
+    Also include:
+    - difficulty: easy / medium / hard
+    - weight:
+        easy = 1
+        medium = 2
+        hard = 3
+
+    Return STRICT JSON:
+
+    [
+      {
+        \"question\": \"...\",
+        \"topic\": \"$skillName\",
+        \"difficulty\": \"medium\",
+        \"weight\": 2,
+        \"options\": {
+          \"A\": \"...\",
+          \"B\": \"...\",
+          \"C\": \"...\",
+          \"D\": \"...\"
+        },
+        \"correct_answer\": \"A\"
+      }
+    ]
+
+    NO explanation. Only JSON.
+    ";
+
+        $response = Http::timeout(20)
+            ->retry(2, 2000)
+            ->withHeaders([
+                'Authorization' => 'Bearer ' . config('services.groq.key'),
+                'Content-Type' => 'application/json'
+            ])
+            ->post('https://api.groq.com/openai/v1/chat/completions', [
+                "model" => "llama-3.3-70b-versatile",
+                "messages" => [
+                    ["role" => "user", "content" => $prompt]
+                ]
+            ]);
+
+        $content = $response->json()['choices'][0]['message']['content'] ?? '';
+
+        // 🔧 Clean JSON (anti AI nakal)
+        $content = preg_replace('/```json|```/', '', $content);
+        $content = trim($content);
+
+        $start = strpos($content, '[');
+        $end = strrpos($content, ']');
+
+        if ($start !== false && $end !== false) {
+            $content = substr($content, $start, $end - $start + 1);
+        }
+
+        $decoded = json_decode($content, true);
+
+        if (!is_array($decoded)) {
+            Log::error("AI Question JSON Invalid", ['content' => $content]);
+            return [];
+        }
+
+        return $decoded;
     }
 }

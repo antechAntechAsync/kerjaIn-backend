@@ -9,11 +9,22 @@ class RoadmapNode extends Model
     protected $fillable = [
         'roadmap_id',
         'skill_name',
-        'order_index'
+        'order_index',
+        'description'
     ];
 
     public function roadmap()
     {
         return $this->belongsTo(Roadmap::class, 'roadmap_id');
+    }
+
+      public function progresses()
+    {
+        return $this->hasMany(UserProgress::class, 'roadmap_node_id');
+    }
+
+    public function assesmentAnswers()
+    {
+        return $this->hasMany(AssessmentAnswer::class, 'roadmap_node_id');
     }
 }

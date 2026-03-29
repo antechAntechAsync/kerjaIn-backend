@@ -9,64 +9,104 @@ use App\Models\InterestQuestion;
 use App\Models\CareerRecommendation;
 use App\Services\InterestAssessmentService;
 
+// class InterestAssessmentController extends Controller
+// {
+
+//     protected $assessmentService;
+
+//     public function __construct(InterestAssessmentService $assessmentService)
+//     {
+//         $this->assessmentService = $assessmentService;
+//     }
+
+//     // GET Questions
+//     public function index()
+//     {
+
+//         $questions = InterestQuestion::with('options')->get();
+
+//         return response()->json([
+//             'status' => 'success',
+//             'questions' => $questions
+//         ]);
+//     }
+
+//     // POST Submit Answers
+//     public function submit(Request $request)
+//     {
+
+//         $studentId = Auth::id();
+
+//         $answers = $request->answers;
+
+//         if (!$answers) {
+//             return response()->json([
+//                 'status' => 'error',
+//                 'message' => 'Answers are required'
+//             ], 400);
+//         }
+
+//         $this->assessmentService->processAssessment($studentId, $answers);
+
+//         return response()->json([
+//             'status' => 'success',
+//             'message' => 'Assessment submitted successfully'
+//         ]);
+//     }
+
+//     // GET Recommendation
+//     public function recommendations()
+//     {
+//         $studentId = Auth::id();
+
+//         $recommendations = CareerRecommendation::where('user_id', $studentId)
+//             ->latest()
+//             ->take(3)
+//             ->get();
+
+//         return response()->json([
+//             'status' => 'success',
+//             'data' => $recommendations
+//         ]);
+//     }
+// }
+
 class InterestAssessmentController extends Controller
 {
+    protected $service;
 
-    protected $assessmentService;
-
-    public function __construct(InterestAssessmentService $assessmentService)
+    public function __construct(InterestAssessmentService $service)
     {
-        $this->assessmentService = $assessmentService;
+        $this->service = $service;
     }
 
-    // GET Questions
-    public function index()
+    public function start(Request $request)
     {
-
-        $questions = InterestQuestion::with('options')->get();
+        $data = $this->service->startSession($request->user()->id);
 
         return response()->json([
-            'status' => 'success',
-            'questions' => $questions
+            'success' => true,
+            'data' => $data,
+            'message' => ''
         ]);
     }
 
-    // POST Submit Answers
-    public function submit(Request $request)
+    public function answer(Request $request)
     {
-
-        $studentId = Auth::id();
-
-        $answers = $request->answers;
-
-        if (!$answers) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Answers are required'
-            ], 400);
-        }
-
-        $this->assessmentService->processAssessment($studentId, $answers);
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Assessment submitted successfully'
+        $request->validate([
+            'session_id' => 'required|exists:interest_sessions,id',
+            'answer' => 'required|string'
         ]);
-    }
 
-    // GET Recommendation
-    public function recommendations()
-    {
-        $studentId = Auth::id();
-
-        $recommendations = CareerRecommendation::where('user_id', $studentId)
-            ->latest()
-            ->take(3)
-            ->get();
+        $data = $this->service->sendAnswer(
+            $request->session_id,
+            $request->answer
+        );
 
         return response()->json([
-            'status' => 'success',
-            'data' => $recommendations
+            'success' => true,
+            'data' => $data,
+            'message' => ''
         ]);
     }
 }

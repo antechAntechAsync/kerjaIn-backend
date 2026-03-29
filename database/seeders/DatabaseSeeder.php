@@ -21,7 +21,8 @@ class DatabaseSeeder extends Seeder
             InterestFieldSeeder::class,
             InterestSubfieldSeeder::class,
             InterestQuestionSeeder::class,
-            CareerRoleSeeder::class
+            CareerRoleSeeder::class,
+            AssessmentScaleSeeder::class
         ]);
     }
 }

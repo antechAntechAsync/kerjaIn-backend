@@ -48,7 +48,14 @@ class User extends Authenticatable
         ];
     }
 
-      public function profile()
+    public function activeRoadmap()
+    {
+        return $this->hasOne(UserRoadmap::class)
+            ->where('is_active', true)
+            ->latest();
+    }
+
+    public function profile()
     {
         return $this->hasOne(StudentProfile::class);
     }

@@ -17,9 +17,8 @@ class ProgressController extends Controller
         $this->progressService = $progressService;
     }
 
-    public function index(Request $request)
+    public function index()
     {
-
         $userId = Auth::id();
 
         $progress = $this->progressService->getUserProgress($userId);
@@ -43,16 +42,20 @@ class ProgressController extends Controller
         ]);
     }
 
-    public function update(Request $request)
+    public function markComplete(Request $request)
     {
 
-        $this->progressService->markCompleted(
+        $updatedProgress = $this->progressService->markCompleted(
             Auth::user()->id,
             $request->roadmap_node_id
         );
 
+        $result = new \stdClass();
+        $result->roadmap_completion = $updatedProgress->roadmap_completion;
         return response()->json([
-            'success' => true
+            'success' => true,
+            'data' => $result,
+            'message' => "Progress updated successfully"
         ]);
     }
 }

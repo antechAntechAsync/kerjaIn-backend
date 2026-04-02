@@ -4,22 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class UserProgress extends Model
+class AssessmentAnswer extends Model
 {
     protected $fillable = [
-        'user_id',
+        'session_id',
         'roadmap_node_id',
-        'status',
-        'completed_at'
+        'scale_value'
     ];
 
-    public function node()
+    public function roadmapNode()
     {
         return $this->belongsTo(RoadmapNode::class, 'roadmap_node_id');
-    }
-
-      public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id');
     }
 }

@@ -7,6 +7,9 @@ use App\Models\SkillAssessmentAnswer;
 use App\Models\InterestSession;
 use Illuminate\Support\Facades\DB;
 
+use App\Services\GroqAI\GroqAIService;
+use App\Services\Student\RoadmapBuilderService;
+
 class SkillAssessmentService
 {
     protected $ai;

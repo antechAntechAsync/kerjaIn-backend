@@ -11,18 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('roadmap_nodes', function (Blueprint $table) {
-
+        Schema::create('job_skill_requirements', function (Blueprint $table) {
             $table->id();
-
-            $table->foreignId('roadmap_id')
-                ->constrained('roadmaps', 'id')
-                ->cascadeOnDelete();
-
-            $table->string('skill_name')->nullable();
-
-            $table->integer('order_index');
-
+            $table->foreignId('job_listing_id')->constrained('job_listings', 'id')->cascadeOnDelete();
+            $table->string('name');
             $table->timestamps();
         });
     }
@@ -32,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('roadmap_nodes');
+        Schema::dropIfExists('job_skill_requirements');
     }
 };

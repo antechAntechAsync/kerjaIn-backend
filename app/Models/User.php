@@ -48,6 +48,16 @@ class User extends Authenticatable
         ];
     }
 
+    public function isStudent()
+    {
+        return $this->role === 'student';
+    }
+
+    public function isProfessional()
+    {
+        return $this->role === 'professional';
+    }
+
     public function activeRoadmap()
     {
         return $this->hasOne(UserRoadmap::class)
@@ -68,5 +78,25 @@ class User extends Authenticatable
     public function careerRecommendations()
     {
         return $this->hasMany(CareerRecommendation::class, 'student_id');
+    }
+
+    public function portfolios()
+    {
+        return $this->hasMany(Portfolio::class);
+    }
+
+    public function portfolioMetric()
+    {
+        return $this->hasOne(PortfolioMetric::class);
+    }
+
+    public function skillStats()
+    {
+        return $this->hasMany(UserSkillStat::class, 'user_id');
+    }
+
+    public function professional()
+    {
+        return $this->hasOne(JobListing::class);
     }
 }

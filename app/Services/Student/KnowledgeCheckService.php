@@ -1,13 +1,15 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Student;
 
 use App\Models\AssessmentSession;
 use App\Models\KnowledgeCheckQuestion;
 use App\Models\KnowledgeCheckAttempt;
 use App\Models\UserRoadmap;
 use App\Models\RoadmapNode;
+use App\Models\UserSkillStat;
 
+use App\Services\GroqAI\GroqAIService;
 class KnowledgeCheckService
 {
     protected $ai;
@@ -187,6 +189,33 @@ class KnowledgeCheckService
                     : 0
             ];
         })->values();
+
+        foreach ($skillBreakdown as $item) {
+
+            $node = RoadmapNode::find($item['roadmap_node_id']);
+            if (!$node) continue;
+
+            $skillId = $node->skill_id;
+            $score = $item['score'];
+
+            $level = match (true) {
+                $score >= 80 => 'advanced',
+                $score >= 50 => 'intermediate',
+                default => 'beginner'
+            };
+
+            UserSkillStat::updateOrCreate(
+                [
+                    'user_id' => $userId,
+                    'skill_id' => $skillId
+                ],
+                [
+                    'score' => $score,
+                    'level' => $level,
+                    'last_updated_at' => now()
+                ]
+            );
+        }
 
         return [
             'score' => round($score),

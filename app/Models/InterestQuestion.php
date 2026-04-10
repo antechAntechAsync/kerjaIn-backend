@@ -6,11 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class InterestQuestion extends Model
 {
-
     protected $fillable = [
         'subfield_id',
         'question',
-        'weight'
+        'weight',
     ];
 
     public function subfield()
@@ -22,5 +21,4 @@ class InterestQuestion extends Model
     {
         return $this->hasMany(InterestOption::class, 'question_id');
     }
-
 }

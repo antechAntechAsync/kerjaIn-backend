@@ -3,13 +3,15 @@
 namespace App\Services\Student;
 
 use App\Models\AssessmentSession;
-use App\Models\KnowledgeCheckQuestion;
 use App\Models\KnowledgeCheckAttempt;
-use App\Models\UserRoadmap;
+use App\Models\KnowledgeCheckQuestion;
 use App\Models\RoadmapNode;
+use App\Models\UserRoadmap;
 use App\Models\UserSkillStat;
-
 use App\Services\GroqAI\GroqAIService;
+
+use function count;
+
 class KnowledgeCheckService
 {
     protected $ai;
@@ -20,7 +22,7 @@ class KnowledgeCheckService
     }
 
     /**
-     * Ambil pertanyaan
+     * Ambil pertanyaan.
      */
     public function getQuestions($userId)
     {
@@ -41,7 +43,6 @@ class KnowledgeCheckService
         $allQuestions = collect();
 
         foreach ($nodes as $node) {
-
             $existing = KnowledgeCheckQuestion::where('roadmap_node_id', $node->id)
                 ->get()
                 ->groupBy('difficulty');
@@ -54,11 +55,9 @@ class KnowledgeCheckService
                 ->take(5);
 
             if ($questions->count() < 5) {
-
                 $generated = $this->ai->generateKnowledgeQuestions($node->skill_name);
 
                 foreach ($generated as $q) {
-
                     if (!isset($q['question'], $q['options'], $q['correct_answer'])) {
                         continue;
                     }
@@ -75,7 +74,9 @@ class KnowledgeCheckService
 
                     $questions->push($saved);
 
-                    if ($questions->count() >= 5) break;
+                    if ($questions->count() >= 5) {
+                        break;
+                    }
                 }
             }
 
@@ -87,13 +88,13 @@ class KnowledgeCheckService
                 'id' => $q->id,
                 'roadmap_node_id' => $q->roadmap_node_id,
                 'question' => $q->question,
-                'options' => $q->options
+                'options' => $q->options,
             ];
         })->values();
     }
 
     /**
-     * Submit jawaban
+     * Submit jawaban.
      */
     public function submit($userId, $answers)
     {
@@ -108,14 +109,14 @@ class KnowledgeCheckService
                 'level' => 'beginner',
                 'correct' => 0,
                 'total' => 0,
-                'skill_breakdown' => []
+                'skill_breakdown' => [],
             ];
         }
 
         $session = AssessmentSession::create([
             'roadmap_id' => $roadmapId,
             'user_id' => $userId,
-            'type' => 'knowledge_check'
+            'type' => 'knowledge_check',
         ]);
 
         $correct = 0;
@@ -127,14 +128,17 @@ class KnowledgeCheckService
         $perNodeScore = [];
 
         foreach ($answers as $ans) {
-
             $question = KnowledgeCheckQuestion::find($ans['question_id']);
 
-            if (!$question) continue;
+            if (!$question) {
+                continue;
+            }
 
             $isCorrect = $ans['selected_answer'] == $question->correct_answer;
 
-            if ($isCorrect) $correct++;
+            if ($isCorrect) {
+                $correct++;
+            }
 
             $weight = $question->weight ?? 1;
 
@@ -150,7 +154,7 @@ class KnowledgeCheckService
             if (!isset($perNodeScore[$nodeId])) {
                 $perNodeScore[$nodeId] = [
                     'earned' => 0,
-                    'total' => 0
+                    'total' => 0,
                 ];
             }
 
@@ -164,7 +168,7 @@ class KnowledgeCheckService
                 'session_id' => $session->id,
                 'question_id' => $question->id,
                 'selected_answer' => $ans['selected_answer'],
-                'is_correct' => $isCorrect
+                'is_correct' => $isCorrect,
             ]);
         }
 
@@ -186,14 +190,15 @@ class KnowledgeCheckService
                 'roadmap_node_id' => $nodeId,
                 'score' => $data['total'] > 0
                     ? round(($data['earned'] / $data['total']) * 100)
-                    : 0
+                    : 0,
             ];
         })->values();
 
         foreach ($skillBreakdown as $item) {
-
             $node = RoadmapNode::find($item['roadmap_node_id']);
-            if (!$node) continue;
+            if (!$node) {
+                continue;
+            }
 
             $skillId = $node->skill_id;
             $score = $item['score'];
@@ -207,13 +212,13 @@ class KnowledgeCheckService
             UserSkillStat::updateOrCreate(
                 [
                     'user_id' => $userId,
-                    'skill_id' => $skillId
+                    'skill_id' => $skillId,
                 ],
                 [
                     'score' => $score,
                     'level' => $level,
-                    'last_updated_at' => now()
-                ]
+                    'last_updated_at' => now(),
+                ],
             );
         }
 
@@ -222,7 +227,7 @@ class KnowledgeCheckService
             'level' => $level,
             'correct' => $correct,
             'total' => $total,
-            'skill_breakdown' => $skillBreakdown
+            'skill_breakdown' => $skillBreakdown,
         ];
     }
 }

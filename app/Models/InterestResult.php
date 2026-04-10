@@ -6,12 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class InterestResult extends Model
 {
-
     protected $fillable = [
         'user_id',
         'question_id',
         'option_id',
-        'score'
+        'score',
     ];
 
     public function student()
@@ -28,5 +27,4 @@ class InterestResult extends Model
     {
         return $this->belongsTo(InterestOption::class);
     }
-
 }

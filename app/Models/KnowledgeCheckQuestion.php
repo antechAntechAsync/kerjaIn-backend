@@ -17,7 +17,7 @@ class KnowledgeCheckQuestion extends Model
     ];
 
     protected $casts = [
-        'options' => 'array'
+        'options' => 'array',
     ];
 
     public function node()

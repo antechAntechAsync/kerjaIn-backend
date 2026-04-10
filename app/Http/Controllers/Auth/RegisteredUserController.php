@@ -4,19 +4,16 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
+use Illuminate\Validation\ValidationException;
 
 class RegisteredUserController extends Controller
 {
     /**
      * Handle an incoming registration request.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
-
     public function register(Request $request)
     {
         $validated = $request->validate([
@@ -24,7 +21,7 @@ class RegisteredUserController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|confirmed|min:6',
             'password_confirmation' => 'required|min:6',
-            'role' => 'required|in:student,professional'
+            'role' => 'required|in:student,professional',
         ]);
 
         $user = User::create([
@@ -45,9 +42,9 @@ class RegisteredUserController extends Controller
                     'name' => $user->name,
                     'email' => $user->email,
                     'role' => $user->role,
-                ]
+                ],
             ],
-            'message' => 'Registration successful'
+            'message' => 'Registration successful',
         ], 201);
     }
 }

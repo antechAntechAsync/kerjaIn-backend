@@ -10,10 +10,12 @@ class PortfolioMetricService
     public function recalculate($userId)
     {
         $user = User::with([
-            'portfolios.projects.skills'
+            'portfolios.projects.skills',
         ])->find($userId);
 
-        if (!$user) return null;
+        if (!$user) {
+            return null;
+        }
 
         $projects = $user->portfolios->flatMap->projects;
 
@@ -27,9 +29,9 @@ class PortfolioMetricService
         $avgComplexity = $projects->avg(fn ($p) => $p->complexity_score) ?? 0;
 
         $portfolioScore = (
-            ($totalProjects * 0.4) +
-            ($totalSkills * 0.3) +
-            ($avgComplexity * 0.3)
+            ($totalProjects * 0.4)
+            + ($totalSkills * 0.3)
+            + ($avgComplexity * 0.3)
         );
 
         return PortfolioMetric::updateOrCreate(
@@ -39,7 +41,7 @@ class PortfolioMetricService
                 'total_skills_covered' => $totalSkills,
                 'avg_complexity_score' => $avgComplexity,
                 'portfolio_score' => $portfolioScore,
-            ]
+            ],
         );
     }
 }

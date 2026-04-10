@@ -1,0 +1,24 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🚀 Running pre-push quality checks..."
+
+# Run PHP linting
+echo "📝 Running PHP Code Sniffer..."
+vendor/bin/phpcs --standard=phpcs.xml.dist --report=summary
+
+if [ $? -ne 0 ]; then
+    echo "❌ PHP Code Sniffer found issues. Run 'npm run lint:php:fix' to fix them."
+    exit 1
+fi
+
+# Run PHPStan analysis
+echo "🔍 Running PHPStan analysis..."
+vendor/bin/phpstan analyse --memory-limit=1G --error-format=table
+
+if [ $? -ne 0 ]; then
+    echo "❌ PHPStan found issues. Please fix them before pushing."
+    exit 1
+fi
+
+echo "✅ All quality checks passed! Ready to push."

@@ -19,21 +19,21 @@ class JobApplicationController extends Controller
     public function apply(Request $request, $id)
     {
         $validated = $request->validate([
-            'cover_letter' => 'nullable|string'
+            'cover_letter' => 'nullable|string',
         ]);
 
         $application = $this->service->apply(
             Auth::user()->id,
             $id,
-            $validated['cover_letter'] ?? null
+            $validated['cover_letter'] ?? null,
         );
 
         return response()->json([
             'success' => true,
             'data' => [
-                'application_id' => $application->id
+                'application_id' => $application->id,
             ],
-            'message' => 'Application submitted'
+            'message' => 'Application submitted',
         ], 201);
     }
 }

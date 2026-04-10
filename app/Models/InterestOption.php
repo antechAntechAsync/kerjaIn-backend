@@ -6,16 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class InterestOption extends Model
 {
-
     protected $fillable = [
         'question_id',
         'option_text',
-        'score'
+        'score',
     ];
 
     public function question()
     {
         return $this->belongsTo(InterestQuestion::class);
     }
-
 }

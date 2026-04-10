@@ -2,15 +2,20 @@
 
 namespace App\Services\Student;
 
-use App\Models\InterestResult;
+use App\Helper\FormatterRole;
 use App\Models\CareerRecommendation;
 use App\Models\CareerRole;
 use App\Models\InterestMessage;
 use App\Models\InterestOption;
+use App\Models\InterestResult;
 use App\Models\InterestSession;
-use App\Helper\FormatterRole;
 use App\Services\GroqAI\GroqAIService;
-use App\Services\Student\RoadmapBuilderService;
+
+use function count;
+
+use Exception;
+
+use function strlen;
 
 class InterestAssessmentService
 // {
@@ -101,9 +106,7 @@ class InterestAssessmentService
         $this->ai = $ai;
     }
 
-    /*
-    | START SESSION
-    */
+    // | START SESSION
     public function startSession($userId)
     {
         // reset session lama
@@ -113,7 +116,7 @@ class InterestAssessmentService
 
         $session = InterestSession::create([
             'user_id' => $userId,
-            'status' => 'in_progress'
+            'status' => 'in_progress',
         ]);
 
         // pertanyaan awal (biar AI tidak kosong)
@@ -124,40 +127,38 @@ class InterestAssessmentService
         InterestMessage::create([
             'session_id' => $session->id,
             'sender' => 'ai',
-            'message' => $response
+            'message' => $response,
         ]);
 
         return [
             'session_id' => $session->id,
-            'question' => $response
+            'question' => $response,
         ];
     }
 
-    /*
-    | SEND ANSWER
-    */
+    // | SEND ANSWER
     public function sendAnswer($sessionId, $answer)
     {
         $session = InterestSession::findOrFail($sessionId);
 
         if ($session->status === 'completed') {
-            throw new \Exception('Session already completed');
+            throw new Exception('Session already completed');
         }
 
         // simpan jawaban user
         InterestMessage::create([
             'session_id' => $sessionId,
             'sender' => 'user',
-            'message' => $answer
+            'message' => $answer,
         ]);
 
         // ambil history
         $messages = InterestMessage::where('session_id', $sessionId)
             ->orderBy('created_at')
             ->get()
-            ->map(fn($m) => [
+            ->map(fn ($m) => [
                 'sender' => $m->sender,
-                'message' => $m->message
+                'message' => $m->message,
             ])
             ->toArray();
 
@@ -165,7 +166,7 @@ class InterestAssessmentService
         if (count($messages) >= 20) {
             $messages[] = [
                 'sender' => 'user',
-                'message' => 'Please conclude and provide FINAL_ROLE now.'
+                'message' => 'Please conclude and provide FINAL_ROLE now.',
             ];
         }
 
@@ -173,7 +174,6 @@ class InterestAssessmentService
 
         // cek apakah final role
         if (str_contains($response, 'FINAL_ROLE:')) {
-
             preg_match('/FINAL_ROLE:\s*(.*)/', $response, $matches);
 
             $role = $matches[1] ?? null;
@@ -185,12 +185,12 @@ class InterestAssessmentService
             $role = trim($role);
 
             if (!$role || strlen($role) > 150) {
-                throw new \Exception("Invalid role from AI: " . $response);
+                throw new Exception('Invalid role from AI: ' . $response);
             }
 
             $session->update([
                 'status' => 'completed',
-                'result_role' => $role
+                'result_role' => $role,
             ]);
 
             $careers = app(GroqAIService::class)
@@ -201,31 +201,31 @@ class InterestAssessmentService
                     ->build(
                         $session->user_id,
                         $career['role'],
-                        $career['roadmap']
+                        $career['roadmap'],
                     );
             }
 
             InterestMessage::create([
                 'session_id' => $sessionId,
                 'sender' => 'ai',
-                'message' => $response
+                'message' => $response,
             ]);
 
             return [
                 'completed' => true,
-                'role' => $role
+                'role' => $role,
             ];
         }
 
         InterestMessage::create([
             'session_id' => $sessionId,
             'sender' => 'ai',
-            'message' => $response
+            'message' => $response,
         ]);
 
         return [
             'completed' => false,
-            'question' => $response
+            'question' => $response,
         ];
     }
 }

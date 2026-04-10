@@ -19,8 +19,9 @@ return new class extends Migration
         $nodes = DB::table('roadmap_nodes')->get();
 
         foreach ($nodes as $node) {
-
-            if (!$node->skill_name) continue;
+            if (!$node->skill_name) {
+                continue;
+            }
 
             $skill = DB::table('skills')->where('name', strtolower($node->skill_name))->first();
 
@@ -28,7 +29,7 @@ return new class extends Migration
                 $skillId = DB::table('skills')->insertGetId([
                     'name' => strtolower($node->skill_name),
                     'created_at' => now(),
-                    'updated_at' => now()
+                    'updated_at' => now(),
                 ]);
             } else {
                 $skillId = $skill->id;
@@ -50,7 +51,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('roadmap_nodes', function (Blueprint $table) {
-            //
         });
     }
 };

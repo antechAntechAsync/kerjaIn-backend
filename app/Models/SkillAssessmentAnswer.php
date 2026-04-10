@@ -10,7 +10,7 @@ class SkillAssessmentAnswer extends Model
         'assessment_id',
         'question',
         'answer',
-        'score'
+        'score',
     ];
 
     public function assessment()

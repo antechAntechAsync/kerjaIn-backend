@@ -9,6 +9,6 @@ class AssessmentScale extends Model
     protected $fillable = [
         'value',
         'label',
-        'description'
+        'description',
     ];
 }

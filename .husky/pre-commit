@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🚀 Running pre-commit checks..."
+
+# Run lint-staged
+npx lint-staged
+
+# Run PHPStan analysis on staged PHP files
+STAGED_PHP_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.php$')
+if [ -n "$STAGED_PHP_FILES" ]; then
+    echo "🔍 Running PHPStan analysis..."
+    vendor/bin/phpstan analyse --memory-limit=1G --error-format=table $STAGED_PHP_FILES
+fi
+
+echo "✅ Pre-commit checks completed!"

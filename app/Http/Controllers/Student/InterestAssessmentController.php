@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
+use App\Models\CareerRecommendation;
+use App\Models\InterestQuestion;
+use App\Services\InterestAssessmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\InterestQuestion;
-use App\Models\CareerRecommendation;
-use App\Services\InterestAssessmentService;
 
 // class InterestAssessmentController extends Controller
 // {
@@ -87,7 +87,7 @@ class InterestAssessmentController extends Controller
         return response()->json([
             'success' => true,
             'data' => $data,
-            'message' => ''
+            'message' => '',
         ]);
     }
 
@@ -95,18 +95,18 @@ class InterestAssessmentController extends Controller
     {
         $request->validate([
             'session_id' => 'required|exists:interest_sessions,id',
-            'answer' => 'required|string'
+            'answer' => 'required|string',
         ]);
 
         $data = $this->service->sendAnswer(
             $request->session_id,
-            $request->answer
+            $request->answer,
         );
 
         return response()->json([
             'success' => true,
             'data' => $data,
-            'message' => ''
+            'message' => '',
         ]);
     }
 }

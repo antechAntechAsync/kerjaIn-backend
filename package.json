@@ -1,0 +1,48 @@
+{
+  "name": "kerjain-backend",
+  "version": "1.0.0",
+  "description": "KerjaIn Backend - Laravel API for Career Guidance Platform",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "prepare": "husky",
+    "lint:php": "vendor/bin/phpcs --standard=phpcs.xml.dist",
+    "lint:php:fix": "vendor/bin/phpcbf --standard=phpcs.xml.dist",
+    "format:php": "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php",
+    "format:pint": "./vendor/bin/pint",
+    "analyze:php": "vendor/bin/phpstan analyse --memory-limit=1G",
+    "test:quality": "npm run lint:php && npm run analyze:php",
+    "format:all": "npm run format:php && npm run format:pint"
+  },
+  "lint-staged": {
+    "*.php": [
+      "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php",
+      "./vendor/bin/pint",
+      "vendor/bin/phpcbf --standard=phpcs.xml.dist --report=summary",
+      "git add"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/antechAntechAsync/kerjaIn-backend.git"
+  },
+  "keywords": [
+    "laravel",
+    "api",
+    "career-guidance",
+    "backend"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/antechAntechAsync/kerjaIn-backend/issues"
+  },
+  "homepage": "https://github.com/antechAntechAsync/kerjaIn-backend#readme",
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0"
+  }
+}

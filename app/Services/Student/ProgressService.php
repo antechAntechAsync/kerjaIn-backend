@@ -2,40 +2,19 @@
 
 namespace App\Services\Student;
 
-use App\Models\UserProgress;
-use Carbon\Carbon;
 use App\Models\AssessmentAnswer;
 use App\Models\AssessmentScale;
-use App\Models\AssessmentSession;
 use App\Models\InterestSession;
 use App\Models\RoadmapNode;
+use App\Models\UserProgress;
 use App\Models\UserSkillStat;
+use Carbon\Carbon;
+use stdClass;
 
 class ProgressService
 {
-
-    private function calculateReadinessScore($sessionId)
-    {
-        $answers = AssessmentAnswer::where('session_id', $sessionId)->get();
-
-        $totalScore = $answers->sum('scale_value');
-
-        $skillCount = $answers->count();
-
-        $maxScale = AssessmentScale::max('value');
-
-        $maxScore = $skillCount * $maxScale;
-
-        if ($maxScore == 0) {
-            return 0;
-        }
-
-        return round(($totalScore / $maxScore) * 100);
-    }
-
     public function getUserProgress($userId): object
     {
-
         $latestSession = InterestSession::where('user_id', $userId)
             ->where('status', 'completed')
             ->latest()
@@ -46,7 +25,6 @@ class ProgressService
         $readinessScore = 0;
 
         if ($latestSession) {
-
             $answers = AssessmentAnswer::where('session_id', $latestSession->id)
                 ->pluck('scale_value', 'roadmap_node_id');
 
@@ -56,14 +34,13 @@ class ProgressService
         $progress = UserProgress::with('node')
             ->where('user_id', $userId)
             ->get()
-            ->map(function ($item) use ($answers) {
-
+            ->map(function ($item) {
                 $nodeId = $item->roadmap_node_id;
 
                 return [
                     'skill' => $item->node->skill_name,
                     // 'level' => $answers[$nodeId] ?? 0,
-                    'completed' => $item->status === 'completed'
+                    'completed' => $item->status === 'completed',
                 ];
             });
 
@@ -78,13 +55,13 @@ class ProgressService
         return (object) [
             'roadmap_completion' => $roadmapCompletion,
             // 'readiness_score' => $readinessScore,
-            'skills' => $progress
+            'skills' => $progress,
         ];
     }
 
     public function getSkillDetail($userId, $nodeId)
     {
-        $result = new \stdClass();
+        $result = new stdClass();
 
         $progress = UserProgress::with('node.roadmap')
             ->where('user_id', $userId)
@@ -108,18 +85,17 @@ class ProgressService
 
         $progress->update([
             'status' => 'completed',
-            'completed_at' => now()
+            'completed_at' => now(),
         ]);
 
         $node = RoadmapNode::find($nodeId);
 
         if ($node) {
-
             $skillId = $node->skill_id;
 
             $stat = UserSkillStat::firstOrNew([
                 'user_id' => $userId,
-                'skill_id' => $skillId
+                'skill_id' => $skillId,
             ]);
 
             $newScore = min(($stat->score ?? 0) + 10, 100);
@@ -135,5 +111,24 @@ class ProgressService
         }
 
         return $this->getUserProgress($userId);
+    }
+
+    private function calculateReadinessScore($sessionId)
+    {
+        $answers = AssessmentAnswer::where('session_id', $sessionId)->get();
+
+        $totalScore = $answers->sum('scale_value');
+
+        $skillCount = $answers->count();
+
+        $maxScale = AssessmentScale::max('value');
+
+        $maxScore = $skillCount * $maxScale;
+
+        if ($maxScore == 0) {
+            return 0;
+        }
+
+        return round(($totalScore / $maxScore) * 100);
     }
 }

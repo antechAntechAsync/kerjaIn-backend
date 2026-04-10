@@ -11,7 +11,7 @@ class RoadmapNode extends Model
         'skill_name',
         'skill_id',
         'order_index',
-        'description'
+        'description',
     ];
 
     public function roadmap()
@@ -19,11 +19,7 @@ class RoadmapNode extends Model
         return $this->belongsTo(Roadmap::class, 'roadmap_id');
     }
 
-<<<<<<< HEAD
-      public function progresses()
-=======
     public function progresses()
->>>>>>> origin/feature/job-system
     {
         return $this->hasMany(UserProgress::class, 'roadmap_node_id');
     }
@@ -38,7 +34,8 @@ class RoadmapNode extends Model
         return $this->belongsTo(Skill::class);
     }
 
-    public function resources() {
+    public function resources()
+    {
         return $this->hasMany(RoadmapNodeResource::class, 'roadmap_node_id');
     }
 

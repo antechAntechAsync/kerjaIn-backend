@@ -1,28 +1,31 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Professional\JobController;
-use App\Http\Controllers\Student\SelfAssessmentController;
 use App\Http\Controllers\Student\InterestAssessmentController;
 use App\Http\Controllers\Student\JobApplicationController;
 use App\Http\Controllers\Student\KnowledgeCheckController;
 use App\Http\Controllers\Student\PortfolioController;
 use App\Http\Controllers\Student\ProgressController;
 use App\Http\Controllers\Student\ProjectController;
-use App\Http\Controllers\Student\SkillAssessmentController;
-use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\Student\SelfAssessmentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Route Authentication Modules
-Route::post('/register', [App\Http\Controllers\Auth\RegisteredUserController::class, 'register']);
-Route::post('/login', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'login']);
-Route::post('/forgot-password', [App\Http\Controllers\Auth\PasswordResetLinkController::class, 'store']);
-Route::post('/reset-password', [App\Http\Controllers\Auth\NewPasswordController::class, 'store']);
+Route::post('/register', [RegisteredUserController::class, 'register']);
+Route::post('/login', [AuthenticatedSessionController::class, 'login']);
+Route::post('/forgot-password', [PasswordResetLinkController::class, 'store']);
+Route::post('/reset-password', [NewPasswordController::class, 'store']);
 Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('google.login');
 Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback']);
 Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
     return response()->json([
-        "user" => $request->user()
+        'user' => $request->user(),
     ]);
 });
 
@@ -71,7 +74,6 @@ Route::prefix('student')->middleware(['auth:sanctum', 'role:student'])->group(fu
     // Route Apply Job
     Route::post('/jobs/{id}/apply', [JobApplicationController::class, 'apply']);
 });
-
 
 Route::prefix('professional')->middleware(['auth:sanctum', 'role:professional'])->group(function () {
     // Route Human Resource Dashboard

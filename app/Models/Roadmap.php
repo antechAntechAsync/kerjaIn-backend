@@ -8,7 +8,7 @@ class Roadmap extends Model
 {
     protected $fillable = [
         'career_role',
-        'level'
+        'level',
     ];
 
     public function nodes()

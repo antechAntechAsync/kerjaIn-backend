@@ -4,13 +4,13 @@ namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
 use App\Services\ReadinessScoreService;
-use Illuminate\Http\Request;
 use App\Services\SelfAssessmentService;
+use Illuminate\Http\Request;
 
 class SelfAssessmentController extends Controller
 {
-
     protected $service;
+
     protected $readinessService;
 
     public function __construct(SelfAssessmentService $service, ReadinessScoreService $readinessService)
@@ -30,16 +30,15 @@ class SelfAssessmentController extends Controller
 
     public function submit(Request $request)
     {
-
         $user = $request->user();
 
         $request->validate([
-            'answers' => 'required|array'
+            'answers' => 'required|array',
         ]);
 
         $session = $this->service->submit(
             $user->id,
-            $request->answers
+            $request->answers,
         );
 
         $readiness = $this->readinessService->calculateReadiness($session->id);
@@ -49,7 +48,7 @@ class SelfAssessmentController extends Controller
         return response()->json([
             'message' => 'Assessment completed',
             'readiness_score' => $readiness,
-            'skills' => $skills
+            'skills' => $skills,
         ]);
     }
 }

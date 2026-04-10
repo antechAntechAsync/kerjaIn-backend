@@ -10,7 +10,7 @@ class KnowledgeCheckAttempt extends Model
         'session_id',
         'question_id',
         'selected_answer',
-        'is_correct'
+        'is_correct',
     ];
 
     public function session()

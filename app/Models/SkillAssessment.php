@@ -10,7 +10,7 @@ class SkillAssessment extends Model
         'user_id',
         'role',
         'level',
-        'score'
+        'score',
     ];
 
     public function user()

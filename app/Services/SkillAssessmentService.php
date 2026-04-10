@@ -2,19 +2,21 @@
 
 namespace App\Services;
 
+use App\Models\InterestSession;
 use App\Models\SkillAssessment;
 use App\Models\SkillAssessmentAnswer;
-use App\Models\InterestSession;
+use Exception;
 use Illuminate\Support\Facades\DB;
 
 class SkillAssessmentService
 {
     protected $ai;
+
     protected $roadmapBuilder;
 
     public function __construct(
         GroqAIService $ai,
-        RoadmapBuilderService $roadmapBuilder
+        RoadmapBuilderService $roadmapBuilder,
     ) {
         $this->ai = $ai;
         $this->roadmapBuilder = $roadmapBuilder;
@@ -23,7 +25,6 @@ class SkillAssessmentService
     public function process($userId, array $answers)
     {
         return DB::transaction(function () use ($userId, $answers) {
-
             // 1. Hitung score & level
             $scoring = $this->calculateScore($answers);
 
@@ -34,7 +35,7 @@ class SkillAssessmentService
                 ->value('result_role');
 
             if (!$role) {
-                throw new \Exception("Role not found");
+                throw new Exception('Role not found');
             }
 
             // 3. Generate high demand skills
@@ -46,7 +47,7 @@ class SkillAssessmentService
                 'user_id' => $userId,
                 'role' => $role,
                 'level' => $scoring['level'],
-                'score' => $scoring['percentage']
+                'score' => $scoring['percentage'],
             ]);
 
             // 5. Simpan answers
@@ -57,7 +58,7 @@ class SkillAssessmentService
                     // 'answer' => $ans['answer'] ?? null,
                     // 'score' => $ans['score']
                     'roadmap_node_id' => $ans['roadmap_node_id'],
-                    'score' => $ans['score']
+                    'score' => $ans['score'],
                 ]);
             }
 
@@ -66,13 +67,13 @@ class SkillAssessmentService
                 $userId,
                 $role,
                 $scoring['level'],
-                $highDemandSkills
+                $highDemandSkills,
             );
 
             return [
                 'level' => $scoring['level'],
                 'score' => $scoring['percentage'],
-                'high_demand_skills' => $highDemandSkills
+                'high_demand_skills' => $highDemandSkills,
             ];
         });
     }
@@ -89,7 +90,6 @@ class SkillAssessmentService
         $maxScore = 0;
 
         foreach ($answers as $ans) {
-
             $score = $ans['score'] ?? 0;
             $weight = $ans['weight'] ?? 1;
 
@@ -103,7 +103,7 @@ class SkillAssessmentService
 
         return [
             'percentage' => round($percentage),
-            'level' => $this->mapLevel($percentage)
+            'level' => $this->mapLevel($percentage),
         ];
     }
 

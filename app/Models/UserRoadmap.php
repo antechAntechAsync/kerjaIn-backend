@@ -10,11 +10,11 @@ class UserRoadmap extends Model
         'user_id',
         'roadmap_id',
         'is_active',
-        'version'
+        'version',
     ];
 
     protected $cast = [
-        'is_active' => 'boolean'
+        'is_active' => 'boolean',
     ];
 
     public function user()

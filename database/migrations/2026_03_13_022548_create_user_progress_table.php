@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('user_progress', function (Blueprint $table) {
-
             $table->id();
 
             $table->foreignId('user_id')
@@ -26,7 +25,7 @@ return new class extends Migration
             $table->enum('status', [
                 'not_started',
                 'in_progress',
-                'completed'
+                'completed',
             ])->default('not_started');
 
             $table->timestamp('completed_at')->nullable();

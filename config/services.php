@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Third Party Services
@@ -36,7 +35,7 @@ return [
     ],
 
     'groq' => [
-        'key' => env('GROQ_API_KEY')
+        'key' => env('GROQ_API_KEY'),
     ],
 
     'google' => [

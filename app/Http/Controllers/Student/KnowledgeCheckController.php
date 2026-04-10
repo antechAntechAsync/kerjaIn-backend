@@ -19,7 +19,7 @@ class KnowledgeCheckController extends Controller
     public function questions()
     {
         return response()->json([
-            'questions' => $this->service->getQuestions(Auth::id())
+            'questions' => $this->service->getQuestions(Auth::id()),
         ]);
     }
 
@@ -28,7 +28,7 @@ class KnowledgeCheckController extends Controller
         $request->validate([
             'answers' => 'required|array|min:1',
             'answers.*.question_id' => 'required|exists:knowledge_check_questions,id',
-            'answers.*.selected_answer' => 'required|in:A,B,C,D'
+            'answers.*.selected_answer' => 'required|in:A,B,C,D',
         ]);
 
         // 🔒 Prevent duplicate question answers
@@ -36,7 +36,7 @@ class KnowledgeCheckController extends Controller
 
         if ($questionIds->count() !== $questionIds->unique()->count()) {
             return response()->json([
-                'message' => 'Duplicate answers detected'
+                'message' => 'Duplicate answers detected',
             ], 422);
         }
 
@@ -44,7 +44,7 @@ class KnowledgeCheckController extends Controller
 
         return response()->json([
             'message' => 'Submitted',
-            'data' => $result
+            'data' => $result,
         ]);
     }
 }

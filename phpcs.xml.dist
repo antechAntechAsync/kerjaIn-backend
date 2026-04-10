@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<ruleset name="KerjaIn PHP Coding Standards">
+    <description>Coding standards for KerjaIn backend project</description>
+
+    <!-- Scan these directories -->
+    <file>app</file>
+    <file>config</file>
+    <file>database</file>
+    <file>routes</file>
+    <file>tests</file>
+
+    <!-- Exclude these directories -->
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/storage/*</exclude-pattern>
+    <exclude-pattern>*/bootstrap/cache/*</exclude-pattern>
+
+    <!-- Show progress -->
+    <arg value="p"/>
+
+    <!-- Use PSR12 as base standard -->
+    <rule ref="PSR12">
+        <!-- Exclude some PSR12 rules that conflict with Laravel -->
+        <exclude name="PSR12.Properties.ConstantVisibility.NotFound"/>
+        <exclude name="PSR12.Files.FileHeader.SpacingAfterBlock"/>
+    </rule>
+
+    <!-- Additional rules -->
+    <rule ref="Generic.Commenting.Todo"/>
+    <rule ref="Generic.CodeAnalysis.EmptyStatement"/>
+    <rule ref="Generic.CodeAnalysis.UnconditionalIfStatement"/>
+    <rule ref="Generic.CodeAnalysis.UselessOverridingMethod"/>
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="120"/>
+            <property name="absoluteLineLimit" value="150"/>
+        </properties>
+    </rule>
+    <rule ref="Generic.Formatting.SpaceAfterCast"/>
+    <rule ref="Generic.NamingConventions.UpperCaseConstantName"/>
+    <rule ref="Generic.PHP.LowerCaseConstant"/>
+    <rule ref="Generic.PHP.LowerCaseKeyword"/>
+    <rule ref="Generic.PHP.LowerCaseType"/>
+    <rule ref="Generic.Strings.UnnecessaryStringConcat"/>
+    <rule ref="Squiz.Classes.ValidClassName"/>
+    <rule ref="Squiz.Scope.MethodScope"/>
+    <rule ref="Squiz.Scope.StaticThisUsage"/>
+    <rule ref="Squiz.WhiteSpace.ScopeClosingBrace"/>
+    <rule ref="Squiz.WhiteSpace.ScopeKeywordSpacing"/>
+    <rule ref="Squiz.WhiteSpace.SuperfluousWhitespace"/>
+    
+    <!-- Laravel specific customizations -->
+    <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
+        <severity>0</severity>
+    </rule>
+
+    <!-- Allow short array syntax -->
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
+    
+    <!-- Method and function naming -->
+    <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+    
+    <!-- Allow test methods to start with test_ -->
+    <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+
+    <!-- Ignore some rules for tests -->
+    <rule ref="PSR2.Methods.FunctionCallSignature">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+</ruleset>

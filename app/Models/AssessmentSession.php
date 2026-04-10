@@ -9,6 +9,6 @@ class AssessmentSession extends Model
     protected $fillable = [
         'user_id',
         'roadmap_id',
-        'type'
+        'type',
     ];
 }

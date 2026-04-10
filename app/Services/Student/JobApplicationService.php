@@ -3,6 +3,7 @@
 namespace App\Services\Student;
 
 use App\Models\JobApplication;
+use Exception;
 
 class JobApplicationService
 {
@@ -14,7 +15,7 @@ class JobApplicationService
             ->exists();
 
         if ($exists) {
-            throw new \Exception('You have already applied to this job');
+            throw new Exception('You have already applied to this job');
         }
 
         return JobApplication::create([

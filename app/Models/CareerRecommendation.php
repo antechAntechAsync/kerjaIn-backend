@@ -6,15 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class CareerRecommendation extends Model
 {
-
     protected $fillable = [
         'user_id',
         'career_role',
-        'roadmap'
+        'roadmap',
     ];
 
     protected $casts = [
-        'roadmap' => 'array'
+        'roadmap' => 'array',
     ];
 
     public function student()

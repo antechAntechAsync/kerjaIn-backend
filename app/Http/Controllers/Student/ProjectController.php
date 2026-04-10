@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Services\ProjectService;
+use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
     public function __construct(
-        protected ProjectService $service
-    ) {}
+        protected ProjectService $service,
+    ) {
+    }
 
     public function store(Request $request)
     {
@@ -29,7 +30,7 @@ class ProjectController extends Controller
         return response()->json([
             'success' => true,
             'data' => ['project_id' => $project['id']],
-            'message' => 'Project added'
+            'message' => 'Project added',
         ], 201);
     }
 }

@@ -1,0 +1,25 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 5
+    paths:
+        - app
+        - config
+        - database
+        - routes
+    excludePaths:
+        - %currentWorkingDirectory%/vendor/*
+        - %currentWorkingDirectory%/storage/*
+        - %currentWorkingDirectory%/bootstrap/cache/*
+    
+    # Laravel specific configuration
+    scanFiles:
+        - app/Models/User.php
+    
+    # Ignore common Laravel patterns
+    ignoreErrors:
+        - '#Method App\\Models\\[A-Za-z]+::[A-Za-z]+\(\) has no return type specified.#'
+        - '#Access to an undefined property App\\Models\\[A-Za-z]+::\$[a-z_]+.#'
+        - '#Cannot call method [a-zA-Z]+\(\) on mixed.#'
+        - '#Call to an undefined method Illuminate\\[A-Za-z\\]+::[a-zA-Z]+\(\)#'

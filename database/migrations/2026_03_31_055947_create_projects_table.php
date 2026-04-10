@@ -4,15 +4,16 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('portfolio_id')
-                  ->constrained('portfolios', 'id')
-                  ->cascadeOnDelete();
+                ->constrained('portfolios', 'id')
+                ->cascadeOnDelete();
 
             $table->string('title');
             $table->text('description')->nullable();
@@ -23,7 +24,7 @@ return new class extends Migration {
                 'design',
                 'documentation',
                 'physical_work',
-                'other'
+                'other',
             ])->default('other');
 
             $table->string('github_url')->nullable();
@@ -34,7 +35,7 @@ return new class extends Migration {
             $table->enum('complexity_level', [
                 'easy',
                 'medium',
-                'hard'
+                'hard',
             ])->default('medium');
 
             $table->boolean('is_featured')->default(false);

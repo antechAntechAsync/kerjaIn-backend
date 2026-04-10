@@ -30,7 +30,7 @@ return new class extends Migration
                 'pending',
                 'reviewed',
                 'accepted',
-                'rejected'
+                'rejected',
             ])->default('pending');
 
             $table->timestamps();

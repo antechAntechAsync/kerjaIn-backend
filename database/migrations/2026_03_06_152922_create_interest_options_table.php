@@ -20,7 +20,6 @@ return new class extends Migration
             $table->text('option_text');
             $table->integer('score')->default(1);
 
-
             $table->timestamps();
         });
     }

@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Services\PortfolioService;
+use Illuminate\Http\Request;
 
 class PortfolioController extends Controller
 {
     public function __construct(
-        protected PortfolioService $service
-    ) {}
+        protected PortfolioService $service,
+    ) {
+    }
 
     public function index(Request $request)
     {
@@ -19,7 +20,7 @@ class PortfolioController extends Controller
         return response()->json([
             'success' => true,
             'data' => $data,
-            'message' => ''
+            'message' => '',
         ]);
     }
 
@@ -27,7 +28,7 @@ class PortfolioController extends Controller
     {
         $portfolio = $this->service->create(
             $request->user()->id,
-            $request->all()
+            $request->all(),
         );
 
         return response()->json($portfolio, 201);

@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class PortfolioMetric extends Model
 {
@@ -32,10 +32,12 @@ class PortfolioMetric extends Model
     public static function recalculate($userId)
     {
         $user = User::with([
-            'portfolios.projects.skills'
+            'portfolios.projects.skills',
         ])->find($userId);
 
-        if (!$user) return null;
+        if (!$user) {
+            return null;
+        }
 
         $projects = $user->portfolios->flatMap->projects;
 
@@ -49,9 +51,9 @@ class PortfolioMetric extends Model
         $avgComplexity = $projects->avg(fn ($p) => $p->complexity_score) ?? 0;
 
         $portfolioScore = (
-            ($totalProjects * 0.4) +
-            ($totalSkills * 0.3) +
-            ($avgComplexity * 0.3)
+            ($totalProjects * 0.4)
+            + ($totalSkills * 0.3)
+            + ($avgComplexity * 0.3)
         );
 
         return self::updateOrCreate(
@@ -61,7 +63,7 @@ class PortfolioMetric extends Model
                 'total_skills_covered' => $totalSkills,
                 'avg_complexity_score' => $avgComplexity,
                 'portfolio_score' => $portfolioScore,
-            ]
+            ],
         );
     }
 }

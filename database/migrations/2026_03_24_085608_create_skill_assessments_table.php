@@ -21,7 +21,7 @@ return new class extends Migration
                 'basic',
                 'intermediate',
                 'advanced',
-                'expert'
+                'expert',
             ]);
 
             $table->integer('score')->nullable();

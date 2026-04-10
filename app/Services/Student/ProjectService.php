@@ -3,8 +3,8 @@
 namespace App\Services\Student;
 
 use App\Models\Project;
-use App\Models\ProjectSkill;
 use App\Models\ProjectMedia;
+use App\Models\ProjectSkill;
 use App\Models\RoadmapNode;
 use App\Models\UserSkillStat;
 use App\Services\PortfolioMetricService;
@@ -15,7 +15,6 @@ class ProjectService
     public function create(array $data)
     {
         return DB::transaction(function () use ($data) {
-
             // 1. Create project
             $project = Project::create([
                 'portfolio_id' => $data['portfolio_id'],
@@ -42,15 +41,16 @@ class ProjectService
             $userId = $project->portfolio->user_id;
 
             foreach ($data['skills'] ?? [] as $nodeId) {
-
                 $node = RoadmapNode::find($nodeId);
-                if (!$node) continue;
+                if (!$node) {
+                    continue;
+                }
 
                 $skillId = $node->skill_id;
 
                 $stat = UserSkillStat::firstOrNew([
                     'user_id' => $userId,
-                    'skill_id' => $skillId
+                    'skill_id' => $skillId,
                 ]);
 
                 // project lebih kuat dari progress

@@ -2,23 +2,24 @@
 
 namespace App\Services\GroqAI;
 
+use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+use function is_array;
+
 class GroqAIService
 {
-
     public function generateCareerRecommendation(array $roles)
     {
-
-        $roleList = implode(", ", $roles);
+        $roleList = implode(', ', $roles);
 
         $prompt = "
         You are an AI career advisor.
 
         Generate a learning roadmap for the following careers:
 
-        $roleList
+        {$roleList}
 
         For EACH career role generate:
 
@@ -110,22 +111,22 @@ class GroqAIService
             ->retry(2, 2000)
             ->withHeaders([
                 'Authorization' => 'Bearer ' . config('services.groq.key'),
-                'Content-Type' => 'application/json'
+                'Content-Type' => 'application/json',
             ])
             ->post('https://api.groq.com/openai/v1/chat/completions', [
-                "model" => "llama-3.3-70b-versatile",
-                "messages" => [
+                'model' => 'llama-3.3-70b-versatile',
+                'messages' => [
                     [
-                        "role" => "user",
-                        "content" => $prompt
-                    ]
-                ]
+                        'role' => 'user',
+                        'content' => $prompt,
+                    ],
+                ],
             ]);
 
         $data = $response->json();
 
         if (!isset($data['choices'][0]['message']['content'])) {
-            throw new \Exception('Invalid response from Groq: ' . json_encode($data));
+            throw new Exception('Invalid response from Groq: ' . json_encode($data));
         }
 
         $content = $data['choices'][0]['message']['content'];
@@ -145,8 +146,7 @@ class GroqAIService
         $decoded = json_decode($content, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-
-            Log::error("Groq JSON Error: " . json_last_error_msg());
+            Log::error('Groq JSON Error: ' . json_last_error_msg());
             Log::error($content);
 
             return [];
@@ -197,15 +197,15 @@ class GroqAIService
 
         $formattedMessages = [
             [
-                "role" => "system",
-                "content" => $systemPrompt
-            ]
+                'role' => 'system',
+                'content' => $systemPrompt,
+            ],
         ];
 
         foreach ($messages as $msg) {
             $formattedMessages[] = [
-                "role" => $msg['sender'] === 'user' ? 'user' : 'assistant',
-                "content" => $msg['message']
+                'role' => $msg['sender'] === 'user' ? 'user' : 'assistant',
+                'content' => $msg['message'],
             ];
         }
 
@@ -213,22 +213,21 @@ class GroqAIService
             ->retry(2, 2000)
             ->withHeaders([
                 'Authorization' => 'Bearer ' . config('services.groq.key'),
-                'Content-Type' => 'application/json'
+                'Content-Type' => 'application/json',
             ])
             ->post('https://api.groq.com/openai/v1/chat/completions', [
-                "model" => "llama-3.3-70b-versatile",
-                "messages" => $formattedMessages
+                'model' => 'llama-3.3-70b-versatile',
+                'messages' => $formattedMessages,
             ]);
 
         $data = $response->json();
 
         if (!isset($data['choices'][0]['message']['content'])) {
-            throw new \Exception('Invalid AI response');
+            throw new Exception('Invalid AI response');
         }
 
         return trim($data['choices'][0]['message']['content']);
     }
-
 
     public function generateHighDemandSkills($role, $level)
     {
@@ -236,10 +235,10 @@ class GroqAIService
     You are an industry expert.
 
     Based on this role:
-    $role
+    {$role}
 
     And skill level:
-    $level
+    {$level}
 
     Generate 3-5 HIGH DEMAND skills in current industry (2025+).
 
@@ -256,22 +255,22 @@ class GroqAIService
             ->retry(2, 2000)
             ->withHeaders([
                 'Authorization' => 'Bearer ' . config('services.groq.key'),
-                'Content-Type' => 'application/json'
+                'Content-Type' => 'application/json',
             ])
             ->post('https://api.groq.com/openai/v1/chat/completions', [
-                "model" => "llama-3.3-70b-versatile",
-                "messages" => [
+                'model' => 'llama-3.3-70b-versatile',
+                'messages' => [
                     [
-                        "role" => "user",
-                        "content" => $prompt
-                    ]
-                ]
+                        'role' => 'user',
+                        'content' => $prompt,
+                    ],
+                ],
             ]);
 
         $data = $response->json();
 
         if (!isset($data['choices'][0]['message']['content'])) {
-            throw new \Exception('Invalid AI response');
+            throw new Exception('Invalid AI response');
         }
 
         $content = trim($data['choices'][0]['message']['content']);
@@ -299,7 +298,7 @@ class GroqAIService
     You are a technical interviewer.
 
     Create 5 multiple choice questions for the skill:
-    $skillName
+    {$skillName}
 
     Rules:
     - Each question must test practical understanding
@@ -319,7 +318,7 @@ class GroqAIService
     [
       {
         \"question\": \"...\",
-        \"topic\": \"$skillName\",
+        \"topic\": \"{$skillName}\",
         \"difficulty\": \"medium\",
         \"weight\": 2,
         \"options\": {
@@ -339,13 +338,13 @@ class GroqAIService
             ->retry(2, 2000)
             ->withHeaders([
                 'Authorization' => 'Bearer ' . config('services.groq.key'),
-                'Content-Type' => 'application/json'
+                'Content-Type' => 'application/json',
             ])
             ->post('https://api.groq.com/openai/v1/chat/completions', [
-                "model" => "llama-3.3-70b-versatile",
-                "messages" => [
-                    ["role" => "user", "content" => $prompt]
-                ]
+                'model' => 'llama-3.3-70b-versatile',
+                'messages' => [
+                    ['role' => 'user', 'content' => $prompt],
+                ],
             ]);
 
         $content = $response->json()['choices'][0]['message']['content'] ?? '';
@@ -364,7 +363,8 @@ class GroqAIService
         $decoded = json_decode($content, true);
 
         if (!is_array($decoded)) {
-            Log::error("AI Question JSON Invalid", ['content' => $content]);
+            Log::error('AI Question JSON Invalid', ['content' => $content]);
+
             return [];
         }
 

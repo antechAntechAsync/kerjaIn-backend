@@ -21,7 +21,7 @@ class PortfolioService
         $portfolios = Portfolio::with([
             'user:id,name',
             'projects.skills.node',
-            'projects.media'
+            'projects.media',
         ])
             ->where('user_id', $userId)
             ->get();
@@ -61,7 +61,7 @@ class PortfolioService
                             ];
                         }),
                     ];
-                })
+                }),
             ];
         });
     }

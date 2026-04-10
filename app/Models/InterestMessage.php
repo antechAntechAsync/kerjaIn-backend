@@ -9,7 +9,7 @@ class InterestMessage extends Model
     protected $fillable = [
         'session_id',
         'sender',
-        'message'
+        'message',
     ];
 
     public function session()

@@ -7,7 +7,6 @@ use App\Models\AssessmentScale;
 
 class ReadinessScoreService
 {
-
     public function calculateReadiness($sessionId)
     {
         $answers = AssessmentAnswer::where('session_id', $sessionId)->get();
@@ -36,13 +35,12 @@ class ReadinessScoreService
         $skills = [];
 
         foreach ($answers as $answer) {
-
             $progress = ($answer->scale_value / $maxScale) * 100;
 
             $skills[] = [
                 'skill' => $answer->roadmapNode->skill_name,
                 'level' => $answer->scale_value,
-                'progress' => round($progress, 2)
+                'progress' => round($progress, 2),
             ];
         }
 

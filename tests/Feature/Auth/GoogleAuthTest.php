@@ -4,11 +4,16 @@ namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Laravel\Socialite\Facades\Socialite;
-use Tests\TestCase;
-use Mockery;
 use Illuminate\Support\Facades\Route;
+use Laravel\Socialite\Facades\Socialite;
+use Mockery;
+use Tests\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 class GoogleAuthTest extends TestCase
 {
     use RefreshDatabase;
@@ -19,8 +24,14 @@ class GoogleAuthTest extends TestCase
 
         // Define a fake 'home' route if it doesn't exist to avoid RouteNotFound errors
         if (!Route::has('home')) {
-            Route::get('/home', fn() => 'home')->name('home');
+            Route::get('/home', fn () => 'home')->name('home');
         }
+    }
+
+    protected function tearDown(): void
+    {
+        Mockery::close();
+        parent::tearDown();
     }
 
     /**
@@ -95,11 +106,5 @@ class GoogleAuthTest extends TestCase
         $response->assertStatus(302);
         $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
         $this->assertStringContainsString($frontendUrl . '/auth/callback?token=', $response->headers->get('Location'));
-    }
-
-    protected function tearDown(): void
-    {
-        Mockery::close();
-        parent::tearDown();
     }
 }

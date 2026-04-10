@@ -10,7 +10,7 @@ class UserProgress extends Model
         'user_id',
         'roadmap_node_id',
         'status',
-        'completed_at'
+        'completed_at',
     ];
 
     public function node()
@@ -18,7 +18,7 @@ class UserProgress extends Model
         return $this->belongsTo(RoadmapNode::class, 'roadmap_node_id');
     }
 
-      public function user()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }

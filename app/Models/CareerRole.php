@@ -9,7 +9,7 @@ class CareerRole extends Model
     protected $fillable = [
         'name',
         'description',
-        'subfield_id'
+        'subfield_id',
     ];
 
     public function subfield()

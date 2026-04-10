@@ -9,7 +9,7 @@ class AssessmentAnswer extends Model
     protected $fillable = [
         'session_id',
         'roadmap_node_id',
-        'scale_value'
+        'scale_value',
     ];
 
     public function roadmapNode()

@@ -7,28 +7,24 @@ use App\Models\RoadmapNode;
 use App\Models\Skill;
 use App\Models\UserProgress;
 use App\Models\UserRoadmap;
-
 use App\Services\GroqAI\GroqAIService;
 
 class RoadmapBuilderService
 {
-
     public function build($userId, $role, $skills)
     {
-
         $roadmap = Roadmap::create([
-            'career_role' => $role
+            'career_role' => $role,
         ]);
 
         UserRoadmap::create([
             'user_id' => $userId,
-            'roadmap_id' => $roadmap->id
+            'roadmap_id' => $roadmap->id,
         ]);
 
         $skillCache = [];
 
         foreach ($skills as $index => $skill) {
-
             if (!isset($skill['skill']) || empty(trim($skill['skill']))) {
                 continue;
             }
@@ -37,7 +33,7 @@ class RoadmapBuilderService
 
             if (!isset($skillCache[$skillName])) {
                 $skillCache[$skillName] = Skill::firstOrCreate([
-                    'name' => $skillName
+                    'name' => $skillName,
                 ]);
             }
 
@@ -47,21 +43,20 @@ class RoadmapBuilderService
                 'roadmap_id' => $roadmap->id,
                 'skill_id' => $skillModel->id,
                 'order_index' => $index + 1,
-                'description' => $skill['description'] ?? null
+                'description' => $skill['description'] ?? null,
             ]);
 
             UserProgress::create([
                 'user_id' => $userId,
-                'roadmap_node_id' => $node->id
+                'roadmap_node_id' => $node->id,
             ]);
 
             // Menyimpan learning source
             foreach ($skill['resources'] ?? [] as $res) {
-
                 if (
-                    !isset($res['title']) ||
-                    !isset($res['url']) ||
-                    !filter_var($res['url'], FILTER_VALIDATE_URL)
+                    !isset($res['title'])
+                    || !isset($res['url'])
+                    || !filter_var($res['url'], FILTER_VALIDATE_URL)
                 ) {
                     continue;
                 }
@@ -69,7 +64,7 @@ class RoadmapBuilderService
                 $node->resources()->create([
                     'title' => $res['title'],
                     'url' => $res['url'],
-                    'type' => strtolower($res['type'] ?? 'unknown')
+                    'type' => strtolower($res['type'] ?? 'unknown'),
                 ]);
             }
         }
@@ -101,33 +96,31 @@ class RoadmapBuilderService
             ->generateCareerRecommendation([$role]);
 
         foreach ($careers as $career) {
-
             $skills = $career['roadmap'];
 
             // 3. inject high demand skills
             foreach ($extraSkills as $skill) {
                 $skills[] = [
                     'skill' => $skill,
-                    'description' => 'High demand industry skill'
+                    'description' => 'High demand industry skill',
                 ];
             }
 
             // 4. build roadmap baru
             $roadmap = Roadmap::create([
                 'career_role' => $career['role'],
-                'level' => $level
+                'level' => $level,
             ]);
 
             UserRoadmap::create([
                 'user_id' => $userId,
                 'roadmap_id' => $roadmap->id,
-                'is_active' => true
+                'is_active' => true,
             ]);
 
             $skillCache = [];
 
             foreach ($skills as $index => $skill) {
-
                 if (!isset($skill['skill']) || empty(trim($skill['skill']))) {
                     continue;
                 }
@@ -136,7 +129,7 @@ class RoadmapBuilderService
 
                 if (!isset($skillCache[$skillName])) {
                     $skillCache[$skillName] = Skill::firstOrCreate([
-                        'name' => $skillName
+                        'name' => $skillName,
                     ]);
                 }
 
@@ -146,21 +139,20 @@ class RoadmapBuilderService
                     'roadmap_id' => $roadmap->id,
                     'skill_id' => $skillModel->id,
                     'order_index' => $index + 1,
-                    'description' => $skill['description'] ?? null
+                    'description' => $skill['description'] ?? null,
                 ]);
 
                 UserProgress::create([
                     'user_id' => $userId,
-                    'roadmap_node_id' => $node->id
+                    'roadmap_node_id' => $node->id,
                 ]);
 
                 // Menyimpan learning source
                 foreach ($skill['resources'] ?? [] as $res) {
-
                     if (
-                        !isset($res['title']) ||
-                        !isset($res['url']) ||
-                        !filter_var($res['url'], FILTER_VALIDATE_URL)
+                        !isset($res['title'])
+                        || !isset($res['url'])
+                        || !filter_var($res['url'], FILTER_VALIDATE_URL)
                     ) {
                         continue;
                     }
@@ -168,7 +160,7 @@ class RoadmapBuilderService
                     $node->resources()->create([
                         'title' => $res['title'],
                         'url' => $res['url'],
-                        'type' => strtolower($res['type'] ?? 'unknown')
+                        'type' => strtolower($res['type'] ?? 'unknown'),
                     ]);
                 }
             }

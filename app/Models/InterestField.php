@@ -6,14 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class InterestField extends Model
 {
-
     protected $fillable = [
-        'name'
+        'name',
     ];
 
     public function subfields()
     {
         return $this->hasMany(InterestSubfield::class, 'field_id');
     }
-
 }

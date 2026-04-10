@@ -10,7 +10,6 @@ class JobService
     public function createJob(array $data, int $professionalId): JobListing
     {
         return DB::transaction(function () use ($data, $professionalId) {
-
             // 1. Create Job
             $job = JobListing::create([
                 'professional_id' => $professionalId,
@@ -22,7 +21,6 @@ class JobService
 
             // 2. Handle required_skills → langsung insert ke table baru
             if (!empty($data['required_skills'])) {
-
                 $requirements = [];
 
                 foreach ($data['required_skills'] as $skillName) {

@@ -15,13 +15,18 @@
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
+        "friendsofphp/php-cs-fixer": "^3.94",
+        "larastan/larastan": "^3.9",
         "laravel/breeze": "^2.3",
         "laravel/pail": "^1.2.2",
         "laravel/pint": "^1.24",
         "laravel/sail": "^1.41",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
-        "phpunit/phpunit": "^11.5.3"
+        "phpstan/extension-installer": "*",
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^11.5.3",
+        "squizlabs/php_codesniffer": "^4.0"
     },
     "autoload": {
         "psr-4": {
@@ -51,6 +56,23 @@
         "test": [
             "@php artisan config:clear --ansi",
             "@php artisan test"
+        ],
+        "lint": [
+            "vendor/bin/phpcs --standard=phpcs.xml.dist --report=summary"
+        ],
+        "lint:fix": [
+            "vendor/bin/phpcbf --standard=phpcs.xml.dist --report=summary"
+        ],
+        "format": [
+            "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php",
+            "./vendor/bin/pint"
+        ],
+        "analyse": [
+            "vendor/bin/phpstan analyse --memory-limit=1G --error-format=table"
+        ],
+        "quality": [
+            "@lint",
+            "@analyse"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
@@ -82,7 +104,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "phpstan/extension-installer": true
         }
     },
     "minimum-stability": "stable",

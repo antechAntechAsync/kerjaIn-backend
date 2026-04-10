@@ -28,15 +28,15 @@ class JobController extends Controller
 
         $job = $this->jobService->createJob(
             $validated,
-            Auth::id()
+            Auth::id(),
         );
 
         return response()->json([
             'success' => true,
             'data' => [
-                'job_id' => $job->id
+                'job_id' => $job->id,
             ],
-            'message' => 'Job created'
+            'message' => 'Job created',
         ], 201);
     }
 }

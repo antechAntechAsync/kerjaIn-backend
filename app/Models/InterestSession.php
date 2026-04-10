@@ -9,7 +9,7 @@ class InterestSession extends Model
     protected $fillable = [
         'user_id',
         'status',
-        'result_role'
+        'result_role',
     ];
 
     public function messages()

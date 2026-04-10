@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\GroqAI;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -22,13 +22,45 @@ class GroqAIService
 
         For EACH career role generate:
 
-        - 5 important skills to learn
         - A short description explaining the ability someone should have for that skill
-        - 1 high quality learning resource for each skill
+        - 1 high quality learning resource for each skill that is publicly available and accessible
+
+        For EACH career role generate:
+
+        - EXACTLY 5 skills
+
+        STRICT RULES FOR SKILLS:
+        - Skill MUST be a short keyword (1–2 words MAX)
+        - DO NOT include explanations inside skill name
+        - DO NOT use phrases longer than 3 words
+        - Skill must be reusable across different jobs
+        - Skill must be commonly used in job requirements
+
+        GOOD examples:
+        - Node.js
+        - REST API
+        - Docker
+        - OAuth
+        - MongoDB
+
+        BAD examples:
+        - Building REST API with Node.js
+        - Authentication and authorization with OAuth 2.0
+        - API design with scalable architecture
+
+        Descriptions:
+        - Explain practical ability (1–2 sentences)
+        - Do NOT repeat skill name
 
         For EACH skill provide:
         - Each skill must be relevant to current industry demand (2025+)
         - Avoid outdated technologies unless foundational
+
+        Normalize skill naming:
+        - Use lowercase
+        - Remove unnecessary words like 'with', 'and', 'using'
+        - Prefer standard industry naming
+
 
         The description must describe:
         - what someone should be able to do with the skill

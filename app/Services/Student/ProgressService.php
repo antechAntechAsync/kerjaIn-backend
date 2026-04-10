@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Student;
 
 use App\Models\UserProgress;
 use Carbon\Carbon;
@@ -8,6 +8,8 @@ use App\Models\AssessmentAnswer;
 use App\Models\AssessmentScale;
 use App\Models\AssessmentSession;
 use App\Models\InterestSession;
+use App\Models\RoadmapNode;
+use App\Models\UserSkillStat;
 
 class ProgressService
 {
@@ -100,7 +102,6 @@ class ProgressService
 
     public function markCompleted($userId, $nodeId)
     {
-
         $progress = UserProgress::where('user_id', $userId)
             ->where('roadmap_node_id', $nodeId)
             ->firstOrFail();
@@ -109,6 +110,29 @@ class ProgressService
             'status' => 'completed',
             'completed_at' => now()
         ]);
+
+        $node = RoadmapNode::find($nodeId);
+
+        if ($node) {
+
+            $skillId = $node->skill_id;
+
+            $stat = UserSkillStat::firstOrNew([
+                'user_id' => $userId,
+                'skill_id' => $skillId
+            ]);
+
+            $newScore = min(($stat->score ?? 0) + 10, 100);
+
+            $stat->score = $newScore;
+            $stat->level = match (true) {
+                $newScore >= 80 => 'advanced',
+                $newScore >= 50 => 'intermediate',
+                default => 'beginner'
+            };
+            $stat->last_updated_at = now();
+            $stat->save();
+        }
 
         return $this->getUserProgress($userId);
     }

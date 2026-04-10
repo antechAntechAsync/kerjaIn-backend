@@ -23,6 +23,19 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'role_name',
+        'google_id',
+        'provider',
+        'avatar',
+        'status',
+        'join_date',
+        'last_login',
+        'user_id',
+        'phone_number',
+        'position',
+        'department',
+        'line_manager',
+        'seconde_line_manager',
     ];
 
     /**

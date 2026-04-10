@@ -5,6 +5,7 @@ use App\Http\Controllers\Student\InterestAssessmentController;
 use App\Http\Controllers\Student\KnowledgeCheckController;
 use App\Http\Controllers\Student\ProgressController;
 use App\Http\Controllers\Student\SkillAssessmentController;
+use App\Http\Controllers\Auth\GoogleAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +14,8 @@ Route::post('/register', [App\Http\Controllers\Auth\RegisteredUserController::cl
 Route::post('/login', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'store']);
 Route::post('/forgot-password', [App\Http\Controllers\Auth\PasswordResetLinkController::class, 'store']);
 Route::post('/reset-password', [App\Http\Controllers\Auth\NewPasswordController::class, 'store']);
+Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('google.login');
+Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback']);
 Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
     return response()->json([
         "user" => $request->user()

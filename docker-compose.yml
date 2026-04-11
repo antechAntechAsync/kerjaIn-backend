@@ -1,0 +1,11 @@
+services:
+  app:
+    build: .
+    container_name: kerjaIn-Backend
+    restart: always
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

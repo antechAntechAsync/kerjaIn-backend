@@ -1,0 +1,28 @@
+name: Deploy KerjaIn Backend
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: SSH Deploy
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOST }}
+          username: deploy
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /home/deploy/Projects/kerjaIn-backend
+
+            git pull origin main
+
+            docker compose down
+            docker compose up -d --build
+
+            docker exec kerjaIn-Backend php artisan migrate --force
+            docker exec kerjaIn-Backend php artisan config:cache
+            docker exec kerjaIn-Backend php artisan route:cache

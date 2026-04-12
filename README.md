@@ -1,5 +1,11 @@
 # 📌 KerjaIn Backend (BE) - SkillMatch SMK Platform
 
+**Bridge Your Skills: Gak Pakai Lama, Langsung KerjaIn Aja!**
+
+**ID Tim:** CC26-PS092  
+**Tema:** Future Ready Work & Economy  
+**Program:** Coding Camp 2026 powered by DBS Foundation
+
 ## 📖 Deskripsi Singkat Proyek
 
 KerjaIn adalah platform web berbasis **two-sided marketplace** yang menghubungkan siswa SMK dengan industri melalui pendekatan berbasis skill.

@@ -2,13 +2,14 @@
 
 namespace App\Services\GroqAI;
 
+use App\Contracts\AIServiceInterface;
 use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 use function is_array;
 
-class GroqAIService
+class GroqAIService implements AIServiceInterface
 {
     public function generateCareerRecommendation(array $roles)
     {

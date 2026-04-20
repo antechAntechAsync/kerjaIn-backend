@@ -38,4 +38,16 @@ class JobService
             return $job;
         });
     }
+
+    public function getJobs(int $professionalId)
+    {
+        return JobListing::where('professional_id', $professionalId);
+    }
+
+    public function getJobById(int $id, int $professionalId)
+    {
+        return JobListing::where('id', $id)
+            ->where('professional_id', $professionalId)
+            ->first();
+    }
 }

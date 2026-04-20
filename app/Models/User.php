@@ -4,16 +4,14 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens;
-
-    use Notifiable;
+    use HasFactory, HasApiTokens, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -25,19 +23,13 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'role_name',
         'google_id',
         'provider',
         'avatar',
-        'status',
-        'join_date',
-        'last_login',
-        'user_id',
         'phone_number',
-        'position',
-        'department',
-        'line_manager',
-        'seconde_line_manager',
+        'industry',
+        'linkedin_url',
+        'is_profile_completed',
     ];
 
     /**
@@ -50,14 +42,37 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    public function isStudent()
+    // ========================================================================
+    // Role Checks
+    // ========================================================================
+
+    public function isStudent(): bool
     {
         return $this->role === 'student';
     }
 
-    public function isProfessional()
+    public function isProfessional(): bool
     {
-        return $this->role === 'professional';
+        return $this->role === 'professional' || $this->role === 'hr';
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    // ========================================================================
+    // Relationships
+    // ========================================================================
+
+    public function studentProfile()
+    {
+        return $this->hasOne(StudentProfile::class);
+    }
+
+    public function professionalProfile()
+    {
+        return $this->hasOne(ProfessionalProfile::class);
     }
 
     public function activeRoadmap()
@@ -65,11 +80,6 @@ class User extends Authenticatable
         return $this->hasOne(UserRoadmap::class)
             ->where('is_active', true)
             ->latest();
-    }
-
-    public function profile()
-    {
-        return $this->hasOne(StudentProfile::class);
     }
 
     public function interestResults()
@@ -87,20 +97,34 @@ class User extends Authenticatable
         return $this->hasMany(Portfolio::class);
     }
 
-    public function portfolioMetric()
+    public function skillScores()
     {
-        return $this->hasOne(PortfolioMetric::class);
+        return $this->hasMany(UserSkillScore::class);
     }
 
-    public function skillStats()
+    public function dailyStreak()
     {
-        return $this->hasMany(UserSkillStat::class, 'user_id');
+        return $this->hasOne(DailyStreak::class);
     }
 
-    public function professional()
+    public function dailyCheckins()
     {
-        return $this->hasOne(JobListing::class);
+        return $this->hasMany(DailyCheckin::class);
     }
+
+    public function jobApplications()
+    {
+        return $this->hasMany(JobApplication::class);
+    }
+
+    public function jobListings()
+    {
+        return $this->hasMany(JobListing::class);
+    }
+
+    // ========================================================================
+    // Casts
+    // ========================================================================
 
     /**
      * Get the attributes that should be cast.
@@ -112,6 +136,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_profile_completed' => 'boolean',
         ];
     }
 }

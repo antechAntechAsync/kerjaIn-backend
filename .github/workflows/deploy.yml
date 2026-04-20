@@ -23,6 +23,18 @@ jobs:
             docker compose down
             docker compose up -d --build
 
+            # Wait for MySQL to be healthy
+            echo "Waiting for MySQL..."
+            sleep 10
+
+            # Run migrations
             docker exec kerjaIn-Backend php artisan migrate --force
-            docker exec kerjaIn-Backend php artisan config:cache
-            docker exec kerjaIn-Backend php artisan route:cache
+
+            # Optimize (config + route + view cache)
+            docker exec kerjaIn-Backend php artisan optimize
+
+            # Restart queue worker to pick up new code
+            docker exec kerjaIn-Queue php artisan queue:restart
+
+            # Link storage
+            docker exec kerjaIn-Backend php artisan storage:link --force

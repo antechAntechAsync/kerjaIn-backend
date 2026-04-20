@@ -3,23 +3,42 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class KnowledgeCheckAttempt extends Model
 {
     protected $fillable = [
-        'session_id',
-        'question_id',
-        'selected_answer',
-        'is_correct',
+        'user_id',
+        'roadmap_node_id',
+        'score',
+        'is_passed',
+        'feedback',
+        'started_at',
+        'completed_at',
     ];
 
-    public function session()
+    protected function casts(): array
     {
-        return $this->belongsTo(AssessmentSession::class, 'session_id');
+        return [
+            'is_passed' => 'boolean',
+            'started_at' => 'datetime',
+            'completed_at' => 'datetime',
+        ];
     }
 
-    public function question()
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(KnowledgeCheckQuestion::class, 'question_id');
+        return $this->belongsTo(User::class);
+    }
+
+    public function node(): BelongsTo
+    {
+        return $this->belongsTo(RoadmapNode::class, 'roadmap_node_id');
+    }
+
+    public function questions(): HasMany
+    {
+        return $this->hasMany(KnowledgeCheckQuestion::class);
     }
 }

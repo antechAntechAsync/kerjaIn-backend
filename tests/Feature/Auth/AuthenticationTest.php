@@ -15,38 +15,94 @@ class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_users_can_authenticate_using_the_login_screen(): void
+    public function test_user_can_login(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'role' => 'student',
+        ]);
 
-        $response = $this->post('/login', [
+        $response = $this->postJson('/api/v1/login', [
             'email' => $user->email,
             'password' => 'password',
         ]);
 
-        $this->assertAuthenticated();
-        $response->assertNoContent();
+        $response->assertOk()
+            ->assertJsonStructure([
+                'success',
+                'message',
+                'data' => ['user', 'token', 'is_profile_completed'],
+            ])
+            ->assertJson([
+                'success' => true,
+                'message' => 'Login successful',
+            ]);
     }
 
-    public function test_users_can_not_authenticate_with_invalid_password(): void
+    public function test_user_cannot_login_with_wrong_password(): void
     {
         $user = User::factory()->create();
 
-        $this->post('/login', [
+        $response = $this->postJson('/api/v1/login', [
             'email' => $user->email,
             'password' => 'wrong-password',
         ]);
 
-        $this->assertGuest();
+        $response->assertStatus(422);
     }
 
-    public function test_users_can_logout(): void
+    public function test_user_cannot_login_with_nonexistent_email(): void
+    {
+        $response = $this->postJson('/api/v1/login', [
+            'email' => 'nonexistent@example.com',
+            'password' => 'password',
+        ]);
+
+        $response->assertStatus(422);
+    }
+
+    public function test_user_can_logout(): void
     {
         $user = User::factory()->create();
+        $token = $user->createToken('auth_token')->plainTextToken;
 
-        $response = $this->actingAs($user)->post('/logout');
+        $response = $this->withHeaders([
+            'Authorization' => "Bearer {$token}",
+        ])->postJson('/api/v1/logout');
 
-        $this->assertGuest();
-        $response->assertNoContent();
+        $response->assertOk()
+            ->assertJson([
+                'success' => true,
+                'message' => 'Logged out successfully',
+            ]);
+
+        // Token should be revoked
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+    }
+
+    public function test_user_can_get_own_info(): void
+    {
+        $user = User::factory()->create(['role' => 'student']);
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        $response = $this->withHeaders([
+            'Authorization' => "Bearer {$token}",
+        ])->getJson('/api/v1/me');
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'success',
+                'data' => ['user'],
+            ]);
+    }
+
+    public function test_unauthenticated_user_cannot_access_me(): void
+    {
+        $response = $this->getJson('/api/v1/me');
+
+        $response->assertStatus(401)
+            ->assertJson([
+                'success' => false,
+                'error_code' => 'UNAUTHENTICATED',
+            ]);
     }
 }

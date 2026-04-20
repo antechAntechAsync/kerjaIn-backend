@@ -113,6 +113,49 @@ class ProgressService
         return $this->getUserProgress($userId);
     }
 
+    public function updateProgress($userId, $nodeId, $progressPercentage)
+    {
+        $progress = UserProgress::where('user_id', $userId)
+            ->where('roadmap_node_id', $nodeId)
+            ->firstOrFail();
+
+        $progress->update([
+            'progress_percentage' => $progressPercentage,
+        ]);
+
+        // If progress is 100%, mark as completed
+        if ($progressPercentage >= 100) {
+            $progress->update([
+                'status' => 'completed',
+                'completed_at' => now(),
+            ]);
+
+            $node = RoadmapNode::find($nodeId);
+
+            if ($node) {
+                $skillId = $node->skill_id;
+
+                $stat = UserSkillStat::firstOrNew([
+                    'user_id' => $userId,
+                    'skill_id' => $skillId,
+                ]);
+
+                $newScore = min(($stat->score ?? 0) + 10, 100);
+
+                $stat->score = $newScore;
+                $stat->level = match (true) {
+                    $newScore >= 80 => 'advanced',
+                    $newScore >= 50 => 'intermediate',
+                    default => 'beginner'
+                };
+                $stat->last_updated_at = now();
+                $stat->save();
+            }
+        }
+
+        return $this->getUserProgress($userId);
+    }
+
     private function calculateReadinessScore($sessionId)
     {
         $answers = AssessmentAnswer::where('session_id', $sessionId)->get();

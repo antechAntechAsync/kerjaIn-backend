@@ -22,3 +22,13 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# AI Context & Planning Files
+implementation_plan*
+qwen*
+QWEN.md
+agents.md
+design.md
+development*
+gemini*
+!API_SPECS.md

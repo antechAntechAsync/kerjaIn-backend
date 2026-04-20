@@ -4,7 +4,9 @@ WORKDIR /app
 
 RUN install-php-extensions \
     pdo_mysql \
-    opcache
+    opcache \
+    redis \
+    gd
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 

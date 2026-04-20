@@ -7,7 +7,7 @@ use App\Models\User;
 use Exception;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
-use Log;
+use Illuminate\Support\Facades\Log;
 
 class GoogleAuthController extends Controller
 {
@@ -20,10 +20,9 @@ class GoogleAuthController extends Controller
     {
         try {
             $googleUser = Socialite::driver('google')->stateless()->user();
+            $frontendUrl = config('app.frontend_url', 'http://localhost:3000');
 
             if (empty($googleUser->email)) {
-                $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
-
                 return redirect($frontendUrl . '/auth/callback?error=' . urlencode('No email returned from Google account.'));
             }
 
@@ -32,6 +31,7 @@ class GoogleAuthController extends Controller
                 ->first();
 
             if (!$user) {
+                // New user via Google — defaults to student, needs profile completion
                 $user = User::create([
                     'name' => $googleUser->name,
                     'email' => $googleUser->email,
@@ -39,38 +39,44 @@ class GoogleAuthController extends Controller
                     'provider' => 'google',
                     'avatar' => $googleUser->avatar,
                     'password' => bcrypt(Str::random(24)),
-                    'role_name' => 'User',
-                    'status' => 'Active',
-                    'join_date' => now(),
+                    'role' => 'student',
+                    'is_profile_completed' => false,
                 ]);
             } else {
+                // Existing user — link Google account if needed
                 if (!$user->google_id) {
                     $user->update([
                         'google_id' => $googleUser->id,
                         'provider' => 'google',
                     ]);
                 }
+
+                // Update avatar from Google if user doesn't have one
+                if (!$user->avatar && $googleUser->avatar) {
+                    $user->update(['avatar' => $googleUser->avatar]);
+                }
             }
 
-            $user->update([
-                'last_login' => now(),
-            ]);
+            // Revoke old tokens
+            $user->tokens()->delete();
 
-            // Generate Token Sanctum
+            // Generate new Sanctum token
             $token = $user->createToken('auth_token')->plainTextToken;
+            $isProfileCompleted = $user->is_profile_completed ? '1' : '0';
 
-            // Redirect ke Frontend dengan Token
-            $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
-
-            return redirect($frontendUrl . '/auth/callback?token=' . urlencode($token));
+            return redirect(
+                $frontendUrl . '/auth/callback?token=' . urlencode($token) .
+                '&is_profile_completed=' . $isProfileCompleted
+            );
         } catch (Exception $e) {
             Log::error('Google OAuth Error', [
                 'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
-            $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
+            $frontendUrl = config('app.frontend_url', 'http://localhost:3000');
 
-            return redirect($frontendUrl . '/auth/callback?error=' . urlencode('Authentication failed.'));
+            return redirect($frontendUrl . '/auth/callback?error=' . urlencode('Authentication failed. Please try again.'));
         }
     }
 }

@@ -29,6 +29,8 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'role' => 'student',
+            'is_profile_completed' => false,
         ];
     }
 
@@ -39,6 +41,57 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Create a student with completed profile.
+     */
+    public function student(): static
+    {
+        return $this->state(fn () => [
+            'role' => 'student',
+            'is_profile_completed' => true,
+            'phone_number' => fake()->phoneNumber(),
+            'industry' => 'Technology',
+            'linkedin_url' => 'https://linkedin.com/in/' . fake()->userName(),
+        ]);
+    }
+
+    /**
+     * Create a professional with completed profile.
+     */
+    public function professional(): static
+    {
+        return $this->state(fn () => [
+            'role' => 'professional',
+            'is_profile_completed' => true,
+            'phone_number' => fake()->phoneNumber(),
+            'industry' => 'Technology',
+            'linkedin_url' => 'https://linkedin.com/in/' . fake()->userName(),
+        ]);
+    }
+
+    /**
+     * Create an admin user.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn () => [
+            'role' => 'admin',
+            'is_profile_completed' => true,
+        ]);
+    }
+
+    /**
+     * Mark profile as completed.
+     */
+    public function withCompletedProfile(): static
+    {
+        return $this->state(fn () => [
+            'is_profile_completed' => true,
+            'phone_number' => fake()->phoneNumber(),
+            'industry' => 'Technology',
         ]);
     }
 }

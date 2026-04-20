@@ -1,0 +1,508 @@
+{
+  "info": {
+    "_postman_id": "17f53fc4-8ea2-4068-9243-87b33b7c26ff",
+    "name": "KerjaIn API",
+    "description": "API testing untuk platform KerjaInEndFragment",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "42738885",
+    "_collection_link": "https://go.postman.co/collection/42738885-17f53fc4-8ea2-4068-9243-87b33b7c26ff?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Auth - Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n \"name\": \"Aji Pamungkas\",\r\n \"email\": \"aji@test.com\",\r\n \"password\": \"password123\",\r\n \"password_confirmation\": \"password123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Auth - Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n \"email\": \"aji@test.com\",\r\n \"password\": \"password123\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Auth - Me",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Student",
+      "item": [
+        {
+          "name": "Interest Assessment",
+          "item": [
+            {
+              "name": "Start Interest Assesment",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/student/interest/start",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "student",
+                    "interest",
+                    "start"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Submit Answer Interest Assesment",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"session_id\": 1,\r\n  \"answer\": \"Aku mau bekerja di perusahaan startup besar\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/student/interest/answer",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "student",
+                    "interest",
+                    "answer"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Learning Progress Tracker",
+          "item": [
+            {
+              "name": "Get All Progress",
+              "request": {
+                "method": "GET",
+                "header": []
+              },
+              "response": []
+            },
+            {
+              "name": "Get Detail Skill",
+              "request": {
+                "method": "GET",
+                "header": []
+              },
+              "response": []
+            },
+            {
+              "name": "Mark Complete Skill",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"roadmap_node_id\" : \"27\" // Ini nanti disesuaikan sama roadmap_node_id di table user_progress\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/student/progress/mark-complete",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "student",
+                    "progress",
+                    "mark-complete"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Self Assessment",
+          "item": [
+            {
+              "name": "Get Self Assessment Questions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/student/assessment/skills",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "student",
+                    "assessment",
+                    "skills"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Submit Self Assesment",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "// Catatan : Nanti ini disesuaikan ya roadmap_node_id nya dari table roadmap_node\r\n// Untuk scale nya juga bisa disesuaikan level nya dari 1-5\r\n\r\n{\r\n  \"answers\": [\r\n    {\r\n      \"roadmap_node_id\": 1,\r\n      \"scale\": 2\r\n    },\r\n    {\r\n      \"roadmap_node_id\": 2,\r\n      \"scale\": 1\r\n    },\r\n    {\r\n      \"roadmap_node_id\": 3,\r\n      \"scale\": 3\r\n    },\r\n    {\r\n      \"roadmap_node_id\": 4,\r\n      \"scale\": 1\r\n    },\r\n    {\r\n      \"roadmap_node_id\": 5,\r\n      \"scale\": 2\r\n    }\r\n  ]\r\n}\r\n\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/student/assessment/skills/submit",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "student",
+                    "assessment",
+                    "skills",
+                    "submit"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Knowledge Check Assessment",
+          "item": [
+            {
+              "name": "Get Knowledge Check Question",
+              "request": {
+                "method": "GET",
+                "header": []
+              },
+              "response": []
+            },
+            {
+              "name": "Submit Knowledge Check",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"answers\": [\r\n    { \"question_id\": 4, \"selected_answer\": \"A\" },\r\n    { \"question_id\": 2, \"selected_answer\": \"A\" },\r\n    { \"question_id\": 3, \"selected_answer\": \"A\" },\r\n    { \"question_id\": 1, \"selected_answer\": \"A\" },\r\n    { \"question_id\": 5, \"selected_answer\": \"A\" },\r\n\r\n    { \"question_id\": 9, \"selected_answer\": \"A\" },\r\n    { \"question_id\": 10, \"selected_answer\": \"A\" },\r\n    { \"question_id\": 6, \"selected_answer\": \"A\" },\r\n    { \"question_id\": 8, \"selected_answer\": \"A\" },\r\n    { \"question_id\": 7, \"selected_answer\": \"D\" },\r\n\r\n    { \"question_id\": 15, \"selected_answer\": \"B\" },\r\n    { \"question_id\": 11, \"selected_answer\": \"C\" },\r\n    { \"question_id\": 13, \"selected_answer\": \"A\" },\r\n    { \"question_id\": 12, \"selected_answer\": \"B\" },\r\n    { \"question_id\": 14, \"selected_answer\": \"C\" }\r\n  ]\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/student/assessment/knowledge-check/submit",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "student",
+                    "assessment",
+                    "knowledge-check",
+                    "submit"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Portfolio System",
+          "item": [
+            {
+              "name": "Portfolio",
+              "item": [
+                {
+                  "name": "Get All Portfolio",
+                  "request": {
+                    "method": "GET",
+                    "header": []
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Add Portfolio",
+                  "request": {
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n  \"title\": \"Backend Engineering Portfolio\",\r\n  \"summary\": \"Collection of backend and cloud-native projects\",\r\n  \"is_public\": true\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/student/portfolio",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "student",
+                        "portfolio"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "Project",
+              "item": [
+                {
+                  "name": "Add Project",
+                  "request": {
+                    "method": "GET",
+                    "header": []
+                  },
+                  "response": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Job Application",
+          "item": [
+            {
+              "name": "Apply Job",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/jobs/1/apply",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    "1",
+                    "apply"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Professional",
+      "item": [
+        {
+          "name": "Auth",
+          "item": [
+            {
+              "name": "Professional - Register",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n \"name\": \"Pamungkas\",\r\n \"email\": \"pamungkas@test.com\",\r\n \"password\": \"password123\",\r\n \"password_confirmation\": \"password123\",\r\n \"role\": \"professional\"\r\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/register",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "register"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Professional - Login",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n \"email\": \"pamungkas@test.com\",\r\n \"password\": \"password123\"\r\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Job Module",
+          "item": [
+            {
+              "name": "Add Job",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/professional/jobs",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "professional",
+                    "jobs"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}

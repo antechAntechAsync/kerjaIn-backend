@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
 use App\Models\CareerRecommendation;
 use App\Models\InterestQuestion;
-use App\Services\InterestAssessmentService;
+use App\Services\Student\InterestAssessmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 

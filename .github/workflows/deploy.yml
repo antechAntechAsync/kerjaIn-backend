@@ -10,31 +10,22 @@ jobs:
 
     steps:
       - name: SSH Deploy
-        uses: appleboy/ssh-action@v1
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST }}
           username: deploy
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd /home/deploy/Projects/kerjaIn-backend
+            cd /www/wwwroot/kerjaIn-backend
 
+            # Pull the latest code
             git pull origin main
 
-            docker compose down
-            docker compose up -d --build
-
-            # Wait for MySQL to be healthy
-            echo "Waiting for MySQL..."
-            sleep 10
+            # Install php dependencies
+            composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
             # Run migrations
-            docker exec kerjaIn-Backend php artisan migrate --force
+            php artisan migrate --force
 
-            # Optimize (config + route + view cache)
-            docker exec kerjaIn-Backend php artisan optimize
-
-            # Restart queue worker to pick up new code
-            docker exec kerjaIn-Queue php artisan queue:restart
-
-            # Link storage
-            docker exec kerjaIn-Backend php artisan storage:link --force
+            # Optimize Laravel
+            php artisan optimize
